@@ -1,29 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>homepage</title>
-<style type="text/css">
-	.button {
-    background-color: #ffffff; 
-    border: none;
-    color: black;
-    padding: 30px 60px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 20px;
-}
-</style>
-	
-	
-</head>
-<body background="media/spc.jpg" >
+{% extends "basesite.html" %}
+
+{% block content %}
 <h1 align="center" style="color: white;">SECURE PERSONAL CLOUD</h1>
-<a href="/signup" class="button" align="left">Signup</a>
-<a href="/login" class="button" style="position: absolute; right: 0; ">Login</a>
+<a href="{% url 'signup' %}" class="button" align="left">Signup</a>
+<a href="{% url 'login' %}" class="button" style="position: absolute; right: 0; ">Login</a>
 <form class="logout-link" action="{% url 'logout' %}" method="post">
     {%csrf_token %}
     <button type="submit" style="position: absolute; right: 30; ">Logout</button>
-</form>>
-</body>
-</html>
+</form>
+{% endblock %}
+
