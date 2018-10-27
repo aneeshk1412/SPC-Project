@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<h1>Si Log In!</h1>
+<form class="site-form" action="{% url 'accounts:login' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    {% if requestGET.next%}
+    <input type="hidden" name="next" value="{{request.GET.next}}">
+    {%endif%}
+    <input type="submit" value="Login">
+</form>
+<body>
+
+</body>
+</html>
