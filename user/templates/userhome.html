@@ -2,4 +2,17 @@
 
 {% block content %}
 <h1>Hello {{ user }}</h1>
+<div>
+{% if files %}
+    <ul>
+      {% for f in files %}
+        <li><div><p>{{ f.dorf }} {{ f.name }}</p><p>{{ f.modifiedTime }}</p></div></li>
+      {% endfor %}
+    </ul>
+    <a href="/user1/create" class="button" align="left">Add Files</a>
+  {% else %}
+    <p>No files are added.</p>
+    <a href="/user1/create" class="button" align="left">Add Files</a>
+  {% endif %}
+</div>
 {% endblock %}
