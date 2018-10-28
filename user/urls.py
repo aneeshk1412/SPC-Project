@@ -9,5 +9,7 @@ app_name = 'user'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.userhome, name='userhome')
+    path('', views.userhome, name='userhome'),
+    path('tree/', views.treeview, name='treeview'),
+    path('<int:pk>/', views.dirview, name='dirview'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
