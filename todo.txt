@@ -5,3 +5,4 @@ render the looks of the html pages
 	display format of the user documents
 put css files in the static files
 better wallpaper selection
+make the title in the templates for all the wep page htmls
