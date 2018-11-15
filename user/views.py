@@ -15,9 +15,29 @@ def userhome(request, username):
     return render(request, 'userhome.html', context)
 
 
+def dfs(node,tab):
+    if node.dorf == 'f':
+        return " "*tab + "|\n" + " "*tab + "|___ "+node.name+"\n"
+    else:
+        children = DirFile.objects.filter(owner__exact=node.owner).filter(parentId__exact=node.id)
+        children = [c for c in children]
+        str = " "*tab + "|\n" + " "*tab + "|___ "+node.name+"\n"
+        for c in children:
+            str = str + dfs(c,tab+6)
+        return str
+
+
 @login_required(login_url="/accounts/login/")
-def treeview(request):
-    return HttpResponse("<h1>Tree View")
+def treeview(request,username):
+    resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact="0")
+    resdocs = [r for r in resdocs]
+    result = ""
+    while not len(resdocs)==0:
+        node = resdocs.pop(0)
+        cur = dfs(node,0)
+        result = result + cur
+    print(result)
+    return HttpResponse("<h3>"+result)
 
 
 @login_required(login_url="/accounts/login/")

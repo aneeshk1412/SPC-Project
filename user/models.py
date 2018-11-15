@@ -15,7 +15,7 @@ class DirFile(models.Model):
         max_length=1,
         choices=TYPE,
         blank=False,
-        default='m',
+        default='f',
         help_text='File or Directory',
     )
     fileContent = models.TextField()
@@ -29,3 +29,4 @@ class DirFile(models.Model):
         df = str(self.dorf)
         res = "Username: " + uname + " Name: " + nme + "Dir or File: " + df + ", Path: " + path + ", ModifiedTime: " + time
         return res
+
