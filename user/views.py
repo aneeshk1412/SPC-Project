@@ -41,5 +41,10 @@ def treeview(request,username):
 
 
 @login_required(login_url="/accounts/login/")
-def dirview(request, id):
-    return HttpResponse("<h3>Dir name {% request.dirfile.id %}")
+def dirview(request, pk, username):
+    if not request.user.username == username:
+        return render(request, 'invalid.html')
+    resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact=pk)
+    dirname = DirFile.objects.get(id=pk)
+    context = {'files': resdocs, 'dir': dirname}
+    return render(request, 'directorypage.html', context)
