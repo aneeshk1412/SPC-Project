@@ -45,6 +45,7 @@ def dirview(request, pk, username):
     if not request.user.username == username:
         return render(request, 'invalid.html')
     resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact=pk)
-    dirname = DirFile.objects.get(id=pk)
-    context = {'files': resdocs, 'dir': dirname}
+    curdir = DirFile.objects.filter(owner__exact=request.user.id).get(id=pk)
+    dirname = curdir.name
+    context = {'files': resdocs, 'dir': dirname }
     return render(request, 'directorypage.html', context)
