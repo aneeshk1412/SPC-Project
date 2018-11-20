@@ -37,7 +37,8 @@ def treeview(request,username):
         cur = dfs(node,0)
         result = result + cur
     print(result)
-    return HttpResponse("<h3>"+result)
+    context = {'resstring': result }
+    return render(request,'treeviewpage.html', context)
 
 
 @login_required(login_url="/accounts/login/")
