@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import DirFile
 from django.views.decorators.csrf import csrf_exempt
+from user.serializers import DirFileDataSerializer
 from user.serializers import DirFileSerializer
 from rest_framework import generics
 from django.contrib.auth.models import User
@@ -82,3 +83,28 @@ def file_contents(request, pth, username, format=None):
         filecontent.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@login_required(login_url="/accounts/login/")
+@api_view(['GET', 'PUT', 'DELETE'])
+def file_data(request, pth, username, format=None):
+    if not request.user.username == username:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        filecontent = DirFile.objects.filter(owner__exact=request.user.id).get(pathLineage=pth)
+    except DirFile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = DirFileDataSerializer(filecontent)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = DirFileDataSerializer(filecontent, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,  status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        filecontent.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
