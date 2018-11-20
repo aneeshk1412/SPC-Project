@@ -9,10 +9,10 @@
         <li><div><p>{{ f.dorf }} <a href="/user/{{ user }}/{{ f.pk }}/">{{ f.name }}</a> </p><p>{{ f.modifiedTime }}</p></div></li>
       {% endfor %}
     </ul>
-    <a href="/user/{{ user }}/tree/" class="button" align="left">Add Files</a>
+    <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
   {% else %}
     <p>No files are added.</p>
-    <a href="/user/{{ user }}/tree/" class="button" align="left">Add Files</a>
+    <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
   {% endif %}
 </div>
 {% endblock %}
