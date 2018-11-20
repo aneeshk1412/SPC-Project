@@ -1,9 +1,13 @@
-from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from django.shortcuts import render
-from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .models import DirFile
-
+from django.views.decorators.csrf import csrf_exempt
+from user.serializers import DirFileSerializer
+from rest_framework import generics
+from django.contrib.auth.models import User
 
 # Create your views here.
 @login_required(login_url="/accounts/login/")
@@ -50,3 +54,31 @@ def dirview(request, pk, username):
     dirname = curdir.name
     context = {'files': resdocs, 'dir': dirname }
     return render(request, 'directorypage.html', context)
+
+
+@login_required(login_url="/accounts/login/")
+@api_view(['GET', 'PUT', 'DELETE'])
+def file_contents(request, pth, username, format=None):
+    if not request.user.username == username:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        filecontent = DirFile.objects.filter(owner__exact=request.user.id).get(pathLineage=pth)
+    except DirFile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = DirFileSerializer(filecontent)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = DirFileSerializer(filecontent, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,  status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        filecontent.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
