@@ -6,3 +6,21 @@ render the looks of the html pages
 put css files in the static files
 better wallpaper selection
 make the title in the templates for all the wep page htmls
+
+observe:
+	put the encryption schema of the dir and dir name ot the .spc
+sync:
+	loop over all dir and subdir - 
+	for every file - call md5sum from server - 
+	if equal continue
+
+	if not -
+		get file details 
+		ask 
+			yes:
+				base64 encode ->
+				# block level
+				# encryption  -> get hash 
+				post api -> filename par ->serialising  -> in sevrver deserialize -> save to db
+
+
