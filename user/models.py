@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class DirFile(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='dir_file', on_delete=models.CASCADE)
     parentId = models.PositiveIntegerField()
     name = models.CharField(max_length=5000)
     md5code = models.CharField(max_length=5000)

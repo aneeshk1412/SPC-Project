@@ -7,10 +7,11 @@ from .models import DirFile
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from user.serializers import DirFileDataSerializer
 from user.serializers import DirFileSerializer
-from rest_framework import generics
+from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.db import transaction
-
+from django.http import Http404
+from django.utils.decorators import method_decorator
 
 # Create your views here.
 @login_required(login_url="/accounts/login/")
@@ -57,92 +58,92 @@ def dirview(request, pk, username):
     context = {'files': resdocs, 'dir': dirname}
     return render(request, 'directorypage.html', context)
 
-
-@login_required(login_url="/accounts/login/")
-@api_view(['GET'])
-def all_observed_files(request, pth, username, format=None):
-    # if not request.user.username == username:
-    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
-    try:
-        filecontent = DirFile.objects.filter(pathLineage__startswith=pth)
-    except DirFile.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = DirFileSerializer(filecontent)
-        return Response(serializer.data)
-
-
-@login_required(login_url="/accounts/login/")
-@api_view(['GET', 'PUT', 'POST', 'DELETE'])
-def file_contents(request, pth, username, format=None):
-    # if not request.user.username == username:
-    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
-    if request.method == 'POST':
-        serializer = DirFileSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            transaction.commit()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        try:
-            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
-        except DirFile.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if request.method == 'GET':
-            serializer = DirFileSerializer(filecontent)
-            return Response(serializer.data)
-
-        elif request.method == 'PUT':
-            serializer = DirFileSerializer(filecontent, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                transaction.commit()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        elif request.method == 'DELETE':
-            filecontent.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@login_required(login_url="/accounts/login/")
-@api_view(['GET', 'PUT', 'POST', 'DELETE'])
-def file_data(request, pth, username, format=None):
-    if not request.data['username'] == username:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    print(pth)
-    if request.method == 'POST':
-        serializer = DirFileDataSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            transaction.commit()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
-        print(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        try:
-            filecontent = DirFile.objects.filter(owner__exact=request.data['owner']).get(pathLineage=pth)
-        except DirFile.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if request.method == 'GET':
-            serializer = DirFileDataSerializer(filecontent)
-            return Response(serializer.data)
-
-        elif request.method == 'PUT':
-            serializer = DirFileDataSerializer(filecontent, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        elif request.method == 'DELETE':
-            filecontent.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+#
+# @login_required(login_url="/accounts/login/")
+# @api_view(['GET'])
+# def all_observed_files(request, pth, username, format=None):
+#     # if not request.user.username == username:
+#     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+#     try:
+#         filecontent = DirFile.objects.filter(pathLineage__startswith=pth)
+#     except DirFile.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#     if request.method == 'GET':
+#         serializer = DirFileSerializer(filecontent)
+#         return Response(serializer.data)
+#
+#
+# @login_required(login_url="/accounts/login/")
+# @api_view(['GET', 'PUT', 'POST', 'DELETE'])
+# def file_contents(request, pth, username, format=None):
+#     # if not request.user.username == username:
+#     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+#     if request.method == 'POST':
+#         serializer = DirFileSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             transaction.commit()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     else:
+#         try:
+#             filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
+#         except DirFile.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#         if request.method == 'GET':
+#             serializer = DirFileSerializer(filecontent)
+#             return Response(serializer.data)
+#
+#         elif request.method == 'PUT':
+#             serializer = DirFileSerializer(filecontent, data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 transaction.commit()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#         elif request.method == 'DELETE':
+#             filecontent.delete()
+#             return Response(status=status.HTTP_204_NO_CONTENT)
+#
+#
+# @login_required(login_url="/accounts/login/")
+# @api_view(['GET', 'PUT', 'POST', 'DELETE'])
+# def file_data(request, pth, username, format=None):
+#     if not request.data['username'] == username:
+#         return Response(status=status.HTTP_401_UNAUTHORIZED)
+#     print(pth)
+#     if request.method == 'POST':
+#         serializer = DirFileDataSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             transaction.commit()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         print(serializer.errors)
+#         print(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     else:
+#         try:
+#             filecontent = DirFile.objects.filter(owner__exact=request.data['owner']).get(pathLineage=pth)
+#         except DirFile.DoesNotExist:
+#             return Response(status=status.HTTP_404_NOT_FOUND)
+#
+#         if request.method == 'GET':
+#             serializer = DirFileDataSerializer(filecontent)
+#             return Response(serializer.data)
+#
+#         elif request.method == 'PUT':
+#             serializer = DirFileDataSerializer(filecontent, data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#         elif request.method == 'DELETE':
+#             filecontent.delete()
+#             return Response(status=status.HTTP_204_NO_CONTENT)
 
 # @permission_classes((IsAuthenticatedOrReadOnly, ))
 # class FileContent(generics.RetrieveUpdateDestroyAPIView):
@@ -153,3 +154,45 @@ def file_data(request, pth, username, format=None):
 # class FileData(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = DirFile.objects.all()
 #     serializer_class = DirFileDataSerializer
+
+
+class FileDetail(APIView):
+    """
+    Retrieve, update or delete a snippet instance.
+    """
+    def get_object(self, pth, userid):
+        try:
+            # print(userid)
+            # print(DirFile.objects.filter(owner__exact=userid).get(pathLineage=pth))
+            return DirFile.objects.filter(owner__exact=userid).get(pathLineage=pth)
+        except DirFile.DoesNotExist:
+            raise Http404
+
+    @method_decorator(login_required(login_url='/accounts/login/'))
+    def get(self, request, pth , username, format=None):
+        file_details = self.get_object(pth, request.data['owner'])
+        serializer = DirFileSerializer(file_details)
+        return Response(serializer.data)
+
+    # @login_required(login_url='/accounts/login/')
+    def put(self, request, pth, username, format=None):
+        file_details = self.get_object(pth, request.data['owner'])
+        serializer = DirFileSerializer(file_details, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # @login_required(login_url='/accounts/login/')
+    def delete(self, request, pth, username, format=None):
+        file_details = self.get_object(pth, request.data['owner'])
+        file_details.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # @login_required(login_url='/accounts/login/')
+    def post(self, request, pth, username, format=None):
+        serializer = DirFileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
