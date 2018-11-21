@@ -56,7 +56,7 @@ def dirview(request, pk, username):
     return render(request, 'directorypage.html', context)
 
 
-# @login_required(login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 @api_view(['GET', 'PUT', 'POST', 'DELETE'])
 def file_contents(request, pth, username, format=None):
     # if not request.user.username == username:
@@ -99,6 +99,8 @@ def file_data(request, pth, username, format=None):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
+        print(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
