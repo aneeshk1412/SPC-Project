@@ -10,6 +10,7 @@ from user.serializers import DirFileSerializer
 from rest_framework import generics
 from django.contrib.auth.models import User
 from django.db import transaction
+import base64
 
 
 # Create your views here.
@@ -51,11 +52,19 @@ def treeview(request, username):
 def dirview(request, pk, username):
     if not request.user.username == username:
         return render(request, 'invalid.html')
-    resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact=pk)
     curdir = DirFile.objects.filter(owner__exact=request.user.id).get(id=pk)
-    dirname = curdir.name
-    context = {'files': resdocs, 'dir': dirname}
-    return render(request, 'directorypage.html', context)
+    if curdir.dorf =='d' :
+        resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact=pk)
+        dirname = curdir.name
+        context = {'files': resdocs, 'dir': dirname}
+        return render(request, 'directorypage.html', context)
+    else:
+        file_data = curdir.fileContent
+        file_data = base64.decodebytes(file_data)
+        filename = curdir.name
+        context = { 'file_name': filename, 'file_data': file_data}
+        return render(request, 'filepage.html', context)
+
 
 
 @login_required(login_url="/accounts/login/")
@@ -104,6 +113,7 @@ def file_contents(request, pth, username, format=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'DELETE':
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -125,7 +135,7 @@ def file_data(request, pth, username, format=None):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
-            filecontent = DirFile.objects.filter(owner__exact=request.data['owner']).get(pathLineage=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
         except DirFile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -143,6 +153,8 @@ def file_data(request, pth, username, format=None):
         elif request.method == 'DELETE':
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 # @permission_classes((IsAuthenticatedOrReadOnly, ))
 # class FileContent(generics.RetrieveUpdateDestroyAPIView):

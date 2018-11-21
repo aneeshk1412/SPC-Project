@@ -18,7 +18,7 @@ class DirFile(models.Model):
         default='f',
         help_text='File or Directory',
     )
-    fileContent = models.TextField()
+    fileContent = models.BinaryField(max_length=10000000)
     modifiedTime = models.DateTimeField(auto_now=True)
 
     def __str__(self):
