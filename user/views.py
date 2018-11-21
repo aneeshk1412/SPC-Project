@@ -73,12 +73,12 @@ def all_observed_files(request, pth, username, format=None):
     # if not request.user.username == username:
     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
     try:
-        filecontent = DirFile.objects.filter(pathLineage__startswith=pth)
+        filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
     except DirFile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = DirFileSerializer(filecontent)
+        serializer = DirFileSerializer(filecontent, many=True)
         return Response(serializer.data)
 
 
@@ -151,6 +151,7 @@ def file_data(request, pth, username, format=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'DELETE':
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
