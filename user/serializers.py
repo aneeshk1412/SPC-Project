@@ -4,9 +4,9 @@ from user.models import DirFile
 class DirFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DirFile
-        fields = ('owner', 'parentId', 'name', 'md5code', 'pathLineage', 'dorf', 'modifiedTime')
+        fields = ('pk', 'owner', 'parentId', 'name', 'md5code', 'pathLineage', 'dorf', 'modifiedTime')
 
 class DirFileDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = DirFile
-        fields = ('owner', 'parentId', 'name', 'md5code', 'pathLineage', 'fileContent', 'dorf', 'modifiedTime')
+        fields = ('pk', 'owner', 'parentId', 'name', 'md5code', 'pathLineage', 'fileContent', 'dorf', 'modifiedTime')

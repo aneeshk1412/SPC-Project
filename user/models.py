@@ -8,7 +8,7 @@ class DirFile(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     parentId = models.PositiveIntegerField()
     name = models.CharField(max_length=5000)
-    md5code = models.UUIDField()
+    md5code = models.CharField(max_length=5000)
     pathLineage = models.TextField()
     TYPE = ( ('f', 'file'), ('d', 'directory'), )
     dorf = models.CharField(
