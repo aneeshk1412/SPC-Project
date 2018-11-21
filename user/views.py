@@ -9,6 +9,8 @@ from user.serializers import DirFileDataSerializer
 from user.serializers import DirFileSerializer
 from rest_framework import generics
 from django.contrib.auth.models import User
+from django.db import transaction
+
 
 # Create your views here.
 @login_required(login_url="/accounts/login/")
@@ -57,6 +59,21 @@ def dirview(request, pk, username):
 
 
 @login_required(login_url="/accounts/login/")
+@api_view(['GET'])
+def all_observed_files(request, pth, username, format=None):
+    # if not request.user.username == username:
+    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        filecontent = DirFile.objects.filter(pathLineage__startswith=pth)
+    except DirFile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = DirFileSerializer(filecontent)
+        return Response(serializer.data)
+
+
+@login_required(login_url="/accounts/login/")
 @api_view(['GET', 'PUT', 'POST', 'DELETE'])
 def file_contents(request, pth, username, format=None):
     # if not request.user.username == username:
@@ -65,11 +82,12 @@ def file_contents(request, pth, username, format=None):
         serializer = DirFileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            transaction.commit()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
-            filecontent = DirFile.objects.filter(owner__exact=request.user.id).get(pathLineage=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
         except DirFile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -81,6 +99,7 @@ def file_contents(request, pth, username, format=None):
             serializer = DirFileSerializer(filecontent, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                transaction.commit()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -94,17 +113,19 @@ def file_contents(request, pth, username, format=None):
 def file_data(request, pth, username, format=None):
     if not request.data['username'] == username:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    print(pth)
     if request.method == 'POST':
         serializer = DirFileDataSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            transaction.commit()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         print(serializer.errors)
         print(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
-            filecontent = DirFile.objects.filter(owner__exact=request.user.id).get(pathLineage=pth)
+            filecontent = DirFile.objects.filter(owner__exact=request.data['owner']).get(pathLineage=pth)
         except DirFile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
