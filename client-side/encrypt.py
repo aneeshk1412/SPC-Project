@@ -153,7 +153,11 @@ def encrypt(file_name , choice , passwordt):
         print(key)
         file_out = open("key.pem", "wb")
         file_out.write(key)
-        iv = Random.get_random_bytes(8)
+        m = hashlib.sha224()
+        m.update(passwordt)
+        iv = m.digest()[:8]
+        print(iv)
+        #iv = Random.get_random_bytes(8)
         file_out = open("iv.pem", "wb")
         file_out.write(iv)
 
@@ -199,5 +203,6 @@ def decrypt(file_name):
 if __name__ == '__main__':
     file = sys.argv[1]
     choice = sys.argv[2]
-    encrypt(file, choice)
+    passwordt = sys.argv[3]
+    encrypt(file, choice , passwordt)
     #decrypt()

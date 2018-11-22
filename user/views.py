@@ -48,11 +48,7 @@ def treeview(request, username):
     return render(request, 'treeviewpage.html', context)
 
 
-def DES3dec (in_filename ):
-    with open("iv.pem" , 'rb') as fiv:
-        iv = fiv.read()
-    with open("key.pem", 'rb') as fiv:
-        key = fiv.read()
+def DES3dec (in_filename , iv, key):
     des3 = DES3.new(key, DES3.MODE_CFB, iv)
     with open(in_filename, 'rb') as in_file:
         with open(".deccrypt", 'wb') as out_file:
@@ -83,14 +79,12 @@ def RSAdec (file):
     with open(".decryt",'wb') as f:
         f.write(data)
 
-def AESdec (file):
+def AESdec (file , key ):
     file_in = open(file, "rb")
     nonce, tag, ciphertext = [file_in.read(x) for x in (16, 16, -1)]
-    filek = open('AES.key', 'rb')
-    key = filek.read()
-    filek.close()
     cipher = AES.new(key, AES.MODE_EAX, nonce)
     data = cipher.decrypt_and_verify(ciphertext, tag)
+    file_in.close()
     with open(".decryt",'wb') as f:
         f.write(data)
 
@@ -100,11 +94,17 @@ def decrypt(file_name):
     print(choice)
     file_name = ".,temp"
     if (choice == 'aes'):
-        AESdec(file_name)
+        key = hashlib.sha256(passwordt).digest()
+        AESdec(file_name , key )
     elif (choice == 'rsa'):
         RSAdec(file_name)
     elif (choice == 'de3'):
-        DES3dec(file_name)
+        key = hashlib.md5(passwordt).digest()
+        m = hashlib.sha224()
+        m.update(passwordt)
+        iv = m.digest()[:8]
+        DES3dec(file_name , iv , key)
+
     else:
         print("Invalid try again")
 
@@ -119,15 +119,17 @@ def dirview(request, pk, username):
         context = {'files': resdocs, 'dir': dirname}
         return render(request, 'directorypage.html', context)
     else:
+        passwordt = "abc!@123"
+
         file_data = curdir.fileContent
         with open (".,temp","wb") as f:
             f.write(file_data)
         filename = curdir.name
-        decrypt(filename)
+        decrypt(filename , passwordt)
 
         with open ("./decrpyt","rb") as f:
             file_data = f.read()
-            
+
         context = { 'file_name': filename, 'file_data': file_data}
         return render(request, 'filepage.html', context)
 
