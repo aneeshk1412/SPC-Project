@@ -89,7 +89,7 @@ def AESdec (file , key ):
         f.write(data)
 
 
-def decrypt(file_name):
+def decrypt(file_name , passwordt ):
     choice = file_name[-5:-2:1]
     print(choice)
     file_name = ".,temp"
