@@ -9,6 +9,7 @@ import time
 import progressbar
 import threading
 import subprocess
+import pythonencryptAES
 
 
 
@@ -43,9 +44,15 @@ def delete_post(ur, dat,dat1,b,s):
     elif b==4:
         if os.path.exists(ur):
             os.remove(ur)
-        print()
+        decrypt(ur,s,dat,dat1)
     elif b==5:
-        print()
+        l = len(ur)
+        if ur[l - 7:l - 1] == str('.' + dat1 + 'en'):
+            decrypt(ur,s, dat, dat1)
+        else:
+            if not os.path.exists(ur):
+                os.makedirs(ur)
+
 
 def md5(fname):
     hash_md5 = hashlib.md5()
@@ -55,8 +62,22 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-def encrypt(fname,pas):
-    subprocess.run('javac BlowEncDec.java; java BlowEncDec e "$pas" $fname',shell=True)
+def encrypt(fname,enc_pas,enc_type):
+    if enc_type=='blo':
+        subprocess.call("javac BlowEncDec.java")
+        subprocess.call("java BlowEncDec e"  + fname+ enc_pas)
+    elif enc_type=='aes':
+        pythonencryptAES.encrypt(fname,enc_pas)
+
+
+
+def decrypt(fname,fcontent,enc_pas,enc_type):
+    if enc_type='blo':
+        subprocess.call("javac BlowEncDec.java")
+        subprocess.call("java BlowEncDec e"  + fname+fcontent+ enc_pas)
+    elif enc_type='aes':
+        pythonencryptAES.decrypt(fname,fcontent,enc_pas)
+
 
 
 
@@ -65,7 +86,7 @@ client_added_files=[]
 client_deleted_files=[]
 
 
-def status(user, pas, userid, rootDir, enc_type, server_url):
+def status(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
     p = Path(rootDir)
     dirname = str(p.name)
     s = requests.Session()
@@ -91,7 +112,7 @@ def status(user, pas, userid, rootDir, enc_type, server_url):
             complete_path = os.path.join(rootDir, relFile)
             if (r2.ok):
                 dicti = r2.json()
-                if dicti['md5code'] != md5(complete_path):
+                if dicti['md5code'] != md5(encrypt(complete_path,enc_pas,enc_type)):
                     client_changed_files.append(str(dirname+'/'+relFile+'/'))
             else:
                 dirlist = os.path.normpath(dirname + '/' + relFile)
@@ -132,8 +153,8 @@ def status(user, pas, userid, rootDir, enc_type, server_url):
 
 
 
-def sync(user, pas, userid, rootDir, enc_type, server_url):
-    client_server=input('Change files on client or server? (c or s): ')
+def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
+
     p = Path(rootDir)
     dirname = str(p.name)
     s = requests.Session()
@@ -141,6 +162,21 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
     csrf_tok = r1.cookies['csrftoken']
     payload = {'username': user, 'password': pas, 'csrfmiddlewaretoken': csrf_tok}
     rs = s.post(server_url+'/accounts/login/', payload)
+    # r = s.get(url=server_url + '/user/' + user + '/allfiles/' + str(p.name), data={'owner': int(userid)})
+    # dat = r.json()
+    # enc_ty=''
+    # for pat in dat:
+    #     enc_ty=pat['encryption_scheme']
+    #     break
+    # if enc_ty==enc_type:
+    #     client_server = input('Change files on client or server? (c or s): ')
+    # else:
+    #     g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+    #     g.write(enc_type + '\n')
+    #     g.write(enc_pas + '\n')
+    #     g.close()
+    client_server = input('Change files on client or server? (c or s): ')
+
     file_dir_list = []
     for dir_, _, files in os.walk(rootDir):
         relDir1 = os.path.relpath(dir_, rootDir)
@@ -154,24 +190,24 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
             if relFile[0:2] == "./":
                 relFile = relFile[2:]
             file_dir_list.append(dirname + '/' + str(relFile) + '.' + enc_type + 'en' + '/')
-
             r2 = s.get(str(server_url + '/user/' + user + '/contents/' + dirname + '/' + relFile) + '.' + enc_type + 'en' + '/',
                        data={'owner': int(userid)})
             complete_path = os.path.join(rootDir, relFile)
-            os.environ('complete_path_env')=complete_path
-            os.environ('pas_env')=pas
             if (r2.ok):
                 dicti = r2.json()
-                if dicti['md5code'] != md5(encrypt(complete_path_env,pas_env)):
+                encrypt(complete_path, enc_pas, enc_type)
+                md=md5(complete_path + '.' + enc_type + 'en')
+                if dicti['md5code'] != md:
                     if client_server == 's':
-                        encrypt(complete_path_env, pas_env)
+
                         with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
                             content = con.read()
                         if os.path.exists(complete_path + '.' + enc_type + 'en'):
                             os.remove(complete_path + '.' + enc_type + 'en')
                         dicti['fileContent'] = content
-                        dicti['md5code'] = md5(complete_path)
+                        dicti['md5code'] = md
                         dicti['username'] = user
+                        dicti['encryption_scheme']=enc_type
                         del dicti['modifiedTime']
                         del dicti['pk']
                         print('Replacing on server ' + dirname + '/' + relFile + '/')
@@ -180,9 +216,12 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                             server_url + '/user/' + user + '/data/' + dirname + '.' + enc_type + 'en' + '/' + relFile) + '/',
                                      dicti, dic, 1, s)
                     else:
+                        r2 = s.get(str(server_url + '/user/' + user + '/data/' + dirname + '/' + relFile) + '/',
+                                   data={'owner': int(userid), 'username': user, 'password': pas})
+                        dat=r2.json()
+                        content=dat['fileContent']
                         print('Replacing on client ' + dirname + '/' + relFile + '/')
-                        progress_bar(complete_path,{},{},4,s)
-
+                        progress_bar(complete_path,enc_pas,enc_type,4,content)
             else:
                 dirlist = os.path.normpath(dirname + '/' + relFile)
                 dirlist = dirlist.split(os.sep)
@@ -201,20 +240,18 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                                 parentid = data2['pk']
                                 owner = int(userid)
                                 username = user
+                                file_type=str(dirlist[i])[-3:0]
                                 name = str(dirlist[i]) + '.' + enc_type + 'en'
-                                md5code = md5(complete_path)
+                                md5code = md5(encrypt(complete_path, enc_pas,enc_type))
                                 dorf = 'f'
                                 pathLineage = pat1
-                                encrypt(complete_path_env, pas_env)
-                                with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
-                                    content = con.read()
-                                if os.path.exists(complete_path + '.' + enc_type + 'en'):
-                                    os.remove(complete_path + '.' + enc_type + 'en')
-                                fileContent = content
+                                fileContent = encrypt(complete_path, enc_pas,enc_type)
+
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
                                          'pathLineage': pathLineage,
                                          'dorf': dorf,
-                                         'fileContent': fileContent, 'md5code': md5code, 'username': username}
+                                         'fileContent': fileContent, 'md5code': md5code, 'username': username,
+                                         'encryption_scheme'= enc_type, 'file_type'= file_type }
                                 dic = {}
                                 print('Adding to server ' + pathLineage)
                                 progress_bar(server_url + '/user/' + user + '/data/' + pathLineage,
@@ -248,7 +285,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                                 fileContent = '-'
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
                                          'pathLineage': pathLineage,
-                                         'dorf': dorf,
+                                         'dorf': dorf, 'encryption_scheme':enc_type,'file_type':'-'
                                          'fileContent': fileContent, 'md5code': md5code, 'username': username}
                                 dic = {}
                                 print('Adding to server ' + pathLineage)
@@ -259,7 +296,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                                 progress_bar(os.path.join(rootDir, pat2), {}, {}, 3, s)
                                 break
 
-    r = s.get(url=server_url + '/user/' + user + '/allfiles/'+str(p.name), data={'owner': int(userid)})
+    r = s.get(url=server_url + '/user/' + user + '/allfiles/' + str(p.name), data={'owner': int(userid)})
     dat=r.json()
     for pat in dat:
         fil=pat['pathLineage']
@@ -275,4 +312,10 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                     print('Deleting from server ' + fil)
                     progress_bar(server_url + '/user/' + user + '/data/' + fil, dicti, dic, 2, s)
             else:
-                print()
+                dirlist = os.path.normpath(fil)
+                dirlist = dirlist.split(os.sep)
+                fil_pat=''
+                for i in range(len(dirlist)-1):
+                    fil_pat=fil_pat+str(dirlist[i+1]) +'/'
+                print('Adding to client ' + fil)
+                progress_bar(os.path.join(rootDir, fil_pat),enc_pas,enc_type,5,content)
