@@ -4,3 +4,4 @@ django-filter
 progressbar
 requests
 python-magic
+pycryptodome

@@ -40,7 +40,6 @@ def login_view(request):
     else:
         form = AuthenticationForm()
 
-    print(request.user)
     return render(request, 'login.html', {'form': form})
 
 
