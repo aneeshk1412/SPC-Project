@@ -61,11 +61,10 @@ def dirview(request, pk, username):
         return render(request, 'directorypage.html', context)
     else:
         filename = curdir.name
+        filename = filename[:-6]
         file_data = curdir.fileContent
         file_data = str(file_data)
         file_data = file_data[2:-1]
-        file_data = 'zoETBZ3L+ixfypJUn2ut/24YPooKReRaQQmYkgeA/73t6j8CmSPOzu6LpSNz17tH'
-        print(file_data)
         context = {'file_name': filename, 'filedata': file_data}
         return render(request, 'AESFileview.html', context)
 
@@ -201,3 +200,4 @@ def file_data(request, pth, username, format=None):
 # class FileData(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = DirFile.objects.all()
 #     serializer_class = DirFileDataSerializer
+
