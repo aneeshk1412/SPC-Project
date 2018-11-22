@@ -60,6 +60,7 @@ def dirview(request, pk, username):
         return render(request, 'directorypage.html', context)
     else:
         file_data = curdir.fileContent
+        #
         file_data = base64.decodebytes(file_data)
         filename = curdir.name
         context = { 'file_name': filename, 'file_data': file_data}
