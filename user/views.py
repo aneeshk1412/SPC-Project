@@ -62,10 +62,13 @@ def dirview(request, pk, username):
     else:
         filename = curdir.name
         filename = filename[:-6]
-        file_data = curdir.fileContent
-        file_data = str(file_data)
-        file_data = file_data[2:-1]
-        context = {'file_name': filename, 'filedata': file_data}
+        # look at this later
+        filedata = curdir.fileContent
+        filedata = str(filedata)
+        filedata = filedata[2:-1]
+        # look at this later
+        filetype = curdir.file_type
+        context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
         return render(request, 'AESFileview.html', context)
 
 
