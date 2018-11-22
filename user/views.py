@@ -62,8 +62,12 @@ def dirview(request, pk, username):
     else:
         filename = curdir.name
         file_data = curdir.fileContent
-        context = {'file_name': filename, 'file_data': file_data}
-        return render(request, 'filepage.html', context)
+        file_data = str(file_data)
+        file_data = file_data[2:-1]
+        file_data = 'zoETBZ3L+ixfypJUn2ut/24YPooKReRaQQmYkgeA/73t6j8CmSPOzu6LpSNz17tH'
+        print(file_data)
+        context = {'file_name': filename, 'filedata': file_data}
+        return render(request, 'AESFileview.html', context)
 
 
 @login_required(login_url="/accounts/login/")
