@@ -60,6 +60,7 @@ def dirview(request, pk, username):
         return render(request, 'directorypage.html', context)
     else:
         file_data = curdir.fileContent
+        #
         file_data = base64.decodebytes(file_data)
         filename = curdir.name
         context = { 'file_name': filename, 'file_data': file_data}
@@ -73,12 +74,12 @@ def all_observed_files(request, pth, username, format=None):
     # if not request.user.username == username:
     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
     try:
-        filecontent = DirFile.objects.filter(pathLineage__startswith=pth)
+        filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
     except DirFile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = DirFileSerializer(filecontent)
+        serializer = DirFileSerializer(filecontent, many=True)
         return Response(serializer.data)
 
 
