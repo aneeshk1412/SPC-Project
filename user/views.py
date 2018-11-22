@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from user.serializers import DirFileDataSerializer
 from user.serializers import DirFileSerializer
 from user.serializers import UserSerializer
-from rest_framework import generics
 from django.contrib.auth.models import User
 from django.db import transaction
 import base64
@@ -16,6 +15,8 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 import hashlib
 from Crypto.Cipher import DES3
+import threading
+import time
 
 
 # Create your views here.
@@ -53,7 +54,7 @@ def treeview(request, username):
     return render(request, 'treeviewpage.html', context)
 
 
-def DES3dec (in_filename , iv, key):
+def DES3dec(in_filename, iv, key):
     des3 = DES3.new(key, DES3.MODE_CFB, iv)
     with open(in_filename, 'rb') as in_file:
         with open(".deccrypt", 'wb') as out_file:
@@ -64,7 +65,7 @@ def DES3dec (in_filename , iv, key):
                 out_file.write(des3.decrypt(chunk))
 
 
-def RSAdec (file):
+def RSAdec(file):
     file_in = open(file, "rb")
 
     private_key = RSA.import_key(open("private.pem").read())
@@ -80,27 +81,28 @@ def RSAdec (file):
     cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
     data = cipher_aes.decrypt_and_verify(ciphertext, tag)
 
-    #print(data.decode("utf-8"))
-    with open(".decryt",'wb') as f:
+    # print(data.decode("utf-8"))
+    with open(".decryt", 'wb') as f:
         f.write(data)
 
-def AESdec (file , key ):
+
+def AESdec(file, key):
     file_in = open(file, "rb")
     nonce, tag, ciphertext = [file_in.read(x) for x in (16, 16, -1)]
     cipher = AES.new(key, AES.MODE_EAX, nonce)
     data = cipher.decrypt_and_verify(ciphertext, tag)
     file_in.close()
-    with open(".decryt",'wb') as f:
+    with open(".decryt", 'wb') as f:
         f.write(data)
 
 
-def decrypt(file_name , passwordt ):
+def decrypt(file_name, passwordt):
     choice = file_name[-5:-2:1]
     print(choice)
     file_name = ".,temp"
     if (choice == 'aes'):
         key = hashlib.sha256(passwordt).digest()
-        AESdec(file_name , key )
+        AESdec(file_name, key)
     elif (choice == 'rsa'):
         RSAdec(file_name)
     elif (choice == 'de3'):
@@ -108,17 +110,18 @@ def decrypt(file_name , passwordt ):
         m = hashlib.sha224()
         m.update(passwordt)
         iv = m.digest()[:8]
-        DES3dec(file_name , iv , key)
+        DES3dec(file_name, iv, key)
 
     else:
         print("Invalid try again")
+
 
 @login_required(login_url="/accounts/login/")
 def dirview(request, pk, username):
     if not request.user.username == username:
         return render(request, 'invalid.html')
     curdir = DirFile.objects.filter(owner__exact=request.user.id).get(id=pk)
-    if curdir.dorf =='d' :
+    if curdir.dorf == 'd':
         resdocs = DirFile.objects.filter(owner__exact=request.user.id).filter(parentId__exact=pk)
         dirname = curdir.name
         context = {'files': resdocs, 'dir': dirname}
@@ -127,25 +130,43 @@ def dirview(request, pk, username):
         passwordt = "abc!@123"
 
         file_data = curdir.fileContent
-        with open (".,temp","wb") as f:
+        with open(".,temp", "wb") as f:
             f.write(file_data)
         filename = curdir.name
-        decrypt(filename , passwordt)
+        decrypt(filename, passwordt)
 
-        with open ("./decrpyt","rb") as f:
+        with open("./decrpyt", "rb") as f:
             file_data = f.read()
 
-        context = { 'file_name': filename, 'file_data': file_data}
+        context = {'file_name': filename, 'file_data': file_data}
         return render(request, 'filepage.html', context)
 
 
+global_time = 0
+
 @login_required(login_url="/accounts/login/")
-@api_view(['GET'])
-def get_user_data(request,username):
+@api_view(['GET', 'POST', 'DELETE'])
+def get_user_data(request, username):
     try:
         userdata = User.objects.get(username__exact=username)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        if userdata.profile.locked == True:
+            # wait for thread to get over
+            # if thread resets
+            # return HttpResponse Busy
+            # if thread ends
+            return Response(status=status.HTTP_423_LOCKED)
+        else:
+            userdata.profile.locked = True
+            # start the thread on server
+            return Response(status=status.HTTP_200_OK)
+
+    if request.method == 'DELETE':
+        userdata.profile.locked = False
+        # kill thread
 
     if request.method == 'GET':
         serializer = UserSerializer(userdata)
@@ -158,7 +179,8 @@ def all_observed_files(request, pth, username, format=None):
     # if not request.user.username == username:
     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
     try:
-        filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
+        filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(
+            pathLineage__startswith=pth)
     except DirFile.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -181,7 +203,8 @@ def file_contents(request, pth, username, format=None):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
-            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(
+                pathLineage=pth)
         except DirFile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -198,7 +221,8 @@ def file_contents(request, pth, username, format=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'DELETE':
-            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(
+                pathLineage__startswith=pth)
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -220,7 +244,8 @@ def file_data(request, pth, username, format=None):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         try:
-            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(pathLineage=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).get(
+                pathLineage=pth)
         except DirFile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -236,11 +261,10 @@ def file_data(request, pth, username, format=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'DELETE':
-            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(
+                pathLineage__startswith=pth)
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 
 # @permission_classes((IsAuthenticatedOrReadOnly, ))
 # class FileContent(generics.RetrieveUpdateDestroyAPIView):
