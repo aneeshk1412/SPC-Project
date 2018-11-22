@@ -29,7 +29,7 @@ def makeuser(user, pas, enc_type):
     f.write(user+'\n')
     f.write(pas+'\n')
     f.close()
-    g=open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+    g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
     g.write(enc_type)
     g.close()
 
@@ -106,11 +106,12 @@ elif sync_dir_cond:
         f.close()
         b=1
     else:
-        enc_type = input('Encryption Type (des or aes or rsa): ')
+        enc_type = input('Encryption Type (DES or AES or RSA): ')
         g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
         g.write(enc_type)
         g.close()
         b=1
+        
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")))
         root_dir = f.readline()
