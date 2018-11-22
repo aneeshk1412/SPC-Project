@@ -16,7 +16,8 @@ urlpatterns = [
     path('<int:pk>/', views.dirview, name='dirview'),
     path('contents/<path:pth>', views.file_contents, name='filecontents'),
     path('data/<path:pth>', views.file_data, name='filedata'),
-    path('allfiles/<path:pth>', views.all_observed_files, name='allobervedfiles')
+    path('allfiles/<path:pth>', views.all_observed_files, name='allobervedfiles'),
+    path('userdata/', views.get_user_data, name='getuserdata'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = format_suffix_patterns(urlpatterns)

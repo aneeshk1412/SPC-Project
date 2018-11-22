@@ -33,6 +33,7 @@ def logintosite(user, pas):
         print('Error: spc server set-url <url> command needs to be run before login')
 
 def makeuser(user, pas, enc_type):
+<<<<<<< HEAD
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/ur.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/ur.txt")))
         server_url = f.readline()
@@ -53,6 +54,15 @@ def makeuser(user, pas, enc_type):
 
 
 
+=======
+    f = open(os.path.expanduser(os.path.join("~", "spc_details/auth.txt")), "w+")
+    f.write(user+'\n')
+    f.write(pas+'\n')
+    f.close()
+    g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+    g.write(enc_type)
+    g.close()
+>>>>>>> ed0fc9b6a49778bb63c349082dbaed7b6769113f
 
 def observer_dir(dir):
     f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")), "w+")
@@ -139,11 +149,12 @@ elif sync_dir_cond:
         f.close()
         b=1
     else:
-        enc_type = input('Encryption Type (des or aes or rsa): ')
+        enc_type = input('Encryption Type (DES or AES or RSA): ')
         g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
         g.write(enc_type)
         g.close()
         b=1
+        
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")))
         root_dir = f.readline()

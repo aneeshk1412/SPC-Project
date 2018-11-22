@@ -27,6 +27,6 @@ class DirFile(models.Model):
         path = str(self.pathLineage)
         time = str(self.modifiedTime)
         df = str(self.dorf)
-        res = "Username: " + uname + " Name: " + nme + "Dir or File: " + df + ", Path: " + path + ", ModifiedTime: " + time
+        res = "Username: " + uname + ", Name: " + nme + ", Dir or File: " + df + ", Path: " + path + ", ModifiedTime: " + time
         return res
 

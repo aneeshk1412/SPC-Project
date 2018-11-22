@@ -7,6 +7,7 @@ from .models import DirFile
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from user.serializers import DirFileDataSerializer
 from user.serializers import DirFileSerializer
+from user.serializers import UserSerializer
 from rest_framework import generics
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -137,6 +138,18 @@ def dirview(request, pk, username):
         context = { 'file_name': filename, 'file_data': file_data}
         return render(request, 'filepage.html', context)
 
+
+@login_required(login_url="/accounts/login/")
+@api_view(['GET'])
+def get_user_data(request,username):
+    try:
+        userdata = User.objects.get(username__exact=username)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(userdata)
+        return Response(serializer.data)
 
 
 @login_required(login_url="/accounts/login/")
