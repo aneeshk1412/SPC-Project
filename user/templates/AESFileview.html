@@ -3,7 +3,8 @@
 {% block content %}
 <h1>{{ file_name }}</h1>
 <div>
-    <div id="textfile"></div>
+    <div id="file"></div>
+    <div id="img"></div>
     <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
 
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/aes.js"></script>
@@ -26,7 +27,9 @@
           iv: iv,
           mode: CryptoJS.mode.CFB
         });
-        document.getElementById('textfile').innerHTML= decrypted.toString(CryptoJS.enc.Utf8);
+
+        document.getElementById('img').innerHTML = '<img src="
+        // document.getElementById('file').innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
     </script>
 
 </div>

@@ -21,6 +21,8 @@ class DirFile(models.Model):
     )
     fileContent = models.BinaryField(max_length=10000000, editable=True)
     modifiedTime = models.DateTimeField(auto_now=True)
+    encyption_scheme = models.CharField(max_length=100)
+    file_type = models.CharField(max_length=20)
 
     def __str__(self):
         uname = str(self.owner)
