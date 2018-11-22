@@ -151,6 +151,7 @@ def file_data(request, pth, username, format=None):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         elif request.method == 'DELETE':
+            filecontent = DirFile.objects.select_for_update().filter(owner__exact=request.data['owner']).filter(pathLineage__startswith=pth)
             filecontent.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
