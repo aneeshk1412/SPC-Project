@@ -68,7 +68,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
 
 			if relFile[0:2] == "./":
 				relFile = relFile[2:]
-			file_dir_list.append(  str(p.name)+ '/' +relFile+'/')
+			file_dir_list.append(  str(p.name)+ '/' +relFile+'.'+enc_type+'en' +'/')
 			dirname = str(p.name)
 			st = str(server_url+'/user/' + user + '/contents/' + dirname + '/' + relFile) + '/'
 
@@ -77,16 +77,16 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
 			if (r2.ok):
 				dicti = r2.json()
 				if dicti['md5code'] != md5(complete_path):
-					with open(complete_path,'rb') as inp:
-						with open('outfile','wb') as out:
-							base64.encode(inp,out)
-					with open('outfile','rb') as con:
-						content=con.readlines()
-					# encrypt.encrypt(complete_path, enc_type,pas)
-					# with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
-					# 	content = con.read()
-					# if os.path.exists(complete_path + '.' + enc_type + 'en'):
-					# 	os.remove(complete_path + '.' + enc_type + 'en')
+					# with open(complete_path,'rb') as inp:
+					# 	with open('outfile','wb') as out:
+					# 		base64.encode(inp,out)
+					# with open('outfile','rb') as con:
+					# 	content=con.readlines()
+					encrypt.encrypt(complete_path, enc_type,pas)
+					with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
+						content = con.read()
+					if os.path.exists(complete_path + '.' + enc_type + 'en'):
+						os.remove(complete_path + '.' + enc_type + 'en')
 					# if(dicti['modifiedTime'] > datetime.fromtimestamp(os.stat(complete_path).st_mtime)):
 					# 	ans=input('Do u want to modify this file? Y or N')
 					# 	if(ans=='Y'):
@@ -101,7 +101,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
 					# print(str(server_url+'/user/' + user + '/data/' + str(p.name) + '/' + relFile) + '/')
 					print('Replacing ' + str(p.name) + '/' + relFile + '/')
 					dic={'owner': int(userid),'username':user,'password':pas}
-					progress_bar(str(server_url+'/user/' + user + '/data/' + str(p.name) + '/' + relFile) + '/',
+					progress_bar(str(server_url+'/user/' + user + '/data/' + str(p.name) +'.'+enc_type+'en'+ '/' + relFile) + '/',
 								 dictic,dic, 1, s)
 			else:
 				dirlist = os.path.normpath(p.name + '/' + relFile)
@@ -129,24 +129,28 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
 							parentid = data2['pk']
 
 						name = dirlist[i]
-						pathLineage = pat + str(name) + '/'
+
 						if i != len(dirlist) - 1:
 							dorf = 'd'
 							fileContent = '-'
 							md5code = '-'
+							pathLineage = pat + str(name) + '/'
+							name=str(name)
 						else:
 							md5code = md5(complete_path)
 							dorf = 'f'
-							with open(complete_path, 'rb') as inp:
-								with open('outfile', 'wb') as out:
-									base64.encode(inp, out)
-							with open('outfile', 'rb') as con:
-								content = con.readlines()
-							# encrypt.encrypt(complete_path, enc_type,pas)
-							# with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
-							# 	content = con.read()
-							# if os.path.exists(complete_path + '.' + enc_type + 'en'):
-							# 	os.remove(complete_path + '.' + enc_type + 'en')
+							pathLineage = pat + str(name) + '.' + enc_type + 'en' + '/'
+							name=str(name)+'.'+enc_type+'en'
+							# with open(complete_path, 'rb') as inp:
+							# 	with open('outfile', 'wb') as out:
+							# 		base64.encode(inp, out)
+							# with open('outfile', 'rb') as con:
+							# 	content = con.readlines()
+							encrypt.encrypt(complete_path, enc_type,pas)
+							with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
+								content = con.read()
+							if os.path.exists(complete_path + '.' + enc_type + 'en'):
+								os.remove(complete_path + '.' + enc_type + 'en')
 							fileContent = content
 						dic = {'owner': owner, 'parentId': int(parentid), 'name': name, 'pathLineage': pathLineage,
 							   'dorf': dorf,
@@ -155,7 +159,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
 						# print(server_url+'/user/' + user + '/data/' + pathLineage)
 						dicti={}
 						print('Adding ' + pathLineage)
-						progress_bar(server_url+'/user/' + user + '/data/' + pathLineage,
+						progress_bar(server_url+'/user/' + user + '/data/' + pathLineage ,
 									 dic,dicti, 0, s)
 
 	r = s.get(url=server_url + '/user/' + user + '/allfiles/'+str(p.name), data={'owner': int(userid)})
