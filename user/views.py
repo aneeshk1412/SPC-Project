@@ -48,6 +48,66 @@ def treeview(request, username):
     return render(request, 'treeviewpage.html', context)
 
 
+def DES3dec (in_filename ):
+    with open("iv.pem" , 'rb') as fiv:
+        iv = fiv.read()
+    with open("key.pem", 'rb') as fiv:
+        key = fiv.read()
+    des3 = DES3.new(key, DES3.MODE_CFB, iv)
+    with open(in_filename, 'rb') as in_file:
+        with open(".deccrypt", 'wb') as out_file:
+            while True:
+                chunk = in_file.read(8192)
+                if len(chunk) == 0:
+                    break
+                out_file.write(des3.decrypt(chunk))
+
+
+def RSAdec (file):
+    file_in = open(file, "rb")
+
+    private_key = RSA.import_key(open("private.pem").read())
+
+    enc_session_key, nonce, tag, ciphertext = \
+        [file_in.read(x) for x in (private_key.size_in_bytes(), 16, 16, -1)]
+
+    # Decrypt the session key with the private RSA key
+    cipher_rsa = PKCS1_OAEP.new(private_key)
+    session_key = cipher_rsa.decrypt(enc_session_key)
+
+    # Decrypt the data with the AES session key
+    cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+    data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+
+    #print(data.decode("utf-8"))
+    with open(".decryt",'wb') as f:
+        f.write(data)
+
+def AESdec (file):
+    file_in = open(file, "rb")
+    nonce, tag, ciphertext = [file_in.read(x) for x in (16, 16, -1)]
+    filek = open('AES.key', 'rb')
+    key = filek.read()
+    filek.close()
+    cipher = AES.new(key, AES.MODE_EAX, nonce)
+    data = cipher.decrypt_and_verify(ciphertext, tag)
+    with open(".decryt",'wb') as f:
+        f.write(data)
+
+
+def decrypt(file_name):
+    choice = file_name[-5:-2:1]
+    print(choice)
+    file_name = ".,temp"
+    if (choice == 'aes'):
+        AESdec(file_name)
+    elif (choice == 'rsa'):
+        RSAdec(file_name)
+    elif (choice == 'de3'):
+        DES3dec(file_name)
+    else:
+        print("Invalid try again")
+
 @login_required(login_url="/accounts/login/")
 def dirview(request, pk, username):
     if not request.user.username == username:
@@ -60,9 +120,14 @@ def dirview(request, pk, username):
         return render(request, 'directorypage.html', context)
     else:
         file_data = curdir.fileContent
-        #
-        file_data = base64.decodebytes(file_data)
+        with open (".,temp","wb") as f:
+            f.write(file_data)
         filename = curdir.name
+        decrypt(filename)
+
+        with open ("./decrpyt","rb") as f:
+            file_data = f.read()
+            
         context = { 'file_name': filename, 'file_data': file_data}
         return render(request, 'filepage.html', context)
 
