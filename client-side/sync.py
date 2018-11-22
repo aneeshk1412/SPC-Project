@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import time
 import progressbar
 import threading
-import encrypt
+import subprocess
 
 
 
@@ -53,6 +53,10 @@ def md5(fname):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def encrypt(fname,pas):
+    subprocess.run('javac BlowEncDec.java; java BlowEncDec e "$pas" $fname',shell=True)
 
 
 
@@ -128,12 +132,6 @@ def status(user, pas, userid, rootDir, enc_type, server_url):
 
 
 
-
-
-
-
-
-
 def sync(user, pas, userid, rootDir, enc_type, server_url):
     client_server=input('Change files on client or server? (c or s): ')
     p = Path(rootDir)
@@ -160,11 +158,13 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
             r2 = s.get(str(server_url + '/user/' + user + '/contents/' + dirname + '/' + relFile) + '.' + enc_type + 'en' + '/',
                        data={'owner': int(userid)})
             complete_path = os.path.join(rootDir, relFile)
+            os.environ('complete_path_env')=complete_path
+            os.environ('pas_env')=pas
             if (r2.ok):
                 dicti = r2.json()
-                if dicti['md5code'] != md5(complete_path):
+                if dicti['md5code'] != md5(encrypt(complete_path_env,pas_env)):
                     if client_server == 's':
-                        encrypt.encrypt(complete_path, enc_type, pas)
+                        encrypt(complete_path_env, pas_env)
                         with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
                             content = con.read()
                         if os.path.exists(complete_path + '.' + enc_type + 'en'):
@@ -205,7 +205,7 @@ def sync(user, pas, userid, rootDir, enc_type, server_url):
                                 md5code = md5(complete_path)
                                 dorf = 'f'
                                 pathLineage = pat1
-                                encrypt.encrypt(complete_path, enc_type, pas)
+                                encrypt(complete_path_env, pas_env)
                                 with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
                                     content = con.read()
                                 if os.path.exists(complete_path + '.' + enc_type + 'en'):
