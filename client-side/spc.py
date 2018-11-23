@@ -76,6 +76,7 @@ version_cond=len(sys.argv)==2 and sys.argv[1]=='version'
 en_de_list_cond=len(sys.argv)==3 and sys.argv[1]=='en-de' and sys.argv[2]=='list'
 help_cond=len(sys.argv)==2 and sys.argv[1]=='help'
 status_cond=len(sys.argv)==2 and sys.argv[1]=='status'
+en_de_update_cond=len(sys.argv)==3 and sys.argv[1]=='en-de' and sys.argv[2]=='update'
 
 # Operations to perform for the conditions
 
@@ -83,7 +84,7 @@ if login_cond:
     user=input('Username: ')
     pas=getpass.getpass(prompt='Password: ', stream=None)
     cpas=getpass.getpass(prompt='Confirm Password: ', stream=None)
-    enc_type=input('Encryption Type (blo or aes or rc4): ')
+    enc_type=input('Encryption Type (blo or aes or arc): ')
     enc_pas=getpass.getpass(prompt='Encryption Password: ', stream=None)
     if pas==cpas:
         if logintosite(user,pas):
@@ -141,7 +142,7 @@ elif sync_dir_cond:
         f.close()
         b=1
     else:
-        enc_type = input('Encryption Type (DES or AES or RSA): ')
+        enc_type = input('Encryption Type (blo or aes or arc): ')
         enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
         b=1
         
@@ -176,9 +177,9 @@ elif server_cond:
 elif version_cond:
     print('2.0')
 elif en_de_list_cond:
-    print('des')
-    print('aes')
-    print('rsa')
+    print('Blowfish')
+    print('AES')
+    print('ARC4')
 elif help_cond:
     print('help')
 elif status_cond:
@@ -220,7 +221,7 @@ elif status_cond:
         f.close()
         b = 1
     else:
-        enc_type = input('Encryption Type (des or aes or rsa): ')
+        enc_type = input('Encryption Type (blo or aes or arc): ')
         enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
         b = 1
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
@@ -241,6 +242,22 @@ elif status_cond:
     user_id = 1
     if a == 1 and b == 1 and c == 1 and d == 1:
         sync.status(usr, pa, user_id, root_dir, enc_type, enc_pas, server_url)
+elif en_de_update_cond:
+    f = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")))
+    con = f.readlines()
+    enc_type = con[0].strip()
+    enc_pas = con[1].strip()
+    f.close()
+    enc_typen = input('Encryption Type (blo or aes or arc): ')
+    enc_pasn = getpass.getpass(prompt='Encryption Password: ', stream=None)
+    if enc_type==enc_typen:
+        print('Error: Encryption types need to be different for updating')
+    else:
+        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+        g.write(enc_typen + '\n')
+        g.write(enc_pasn + '\n')
+        g.close()
+
 else:
     print("spc: invalid option -- ", end='')
     for i in range(len(sys.argv)-2):

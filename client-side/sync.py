@@ -47,11 +47,10 @@ def delete_post(ur, dat,dat1,b,s):
             os.remove(ur)
         decrypt(ur,s,dat,dat1)
     elif b==5:
-        l = len(ur)
         decrypt(ur,s, dat, dat1)
-        # else:
-        #     if not os.path.exists(ur):
-        #         os.makedirs(ur)
+    elif b==6:
+        if not os.path.exists(ur):
+            os.makedirs(ur)
 
 
 def md5(fname):
@@ -142,11 +141,11 @@ def status(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
             else:
                 client_deleted_files.append(fil)
     print('Files different in client and server: ',end='')
-    print(client_changed_files)
+    print(list(set(client_changed_files)))
     print('Files in client and not in server: ', end='')
-    print(client_added_files)
+    print(list(set(client_added_files)))
     print('Files not in client and in server: ', end='')
-    print(client_deleted_files)
+    print(list(set(client_deleted_files)))
 
 
 
