@@ -13,6 +13,9 @@
 			document.getElementById('file').innerHTML = datat;
 	</script>
 	rc4
+
+
+
 	<div id="fil2"></div>
 	<script type="text/javascript">
 	var ARC4 = function(key){
@@ -91,18 +94,17 @@ Array.prototype.isEqualTo = function(array){
     }
 
     return true;
-}
-
+};
 </script>
 	<script type="text/javascript">
-		var cipher = new ARC4('Key');
-        var buffer = cipher.encrypt('Plaintext');
-        buffer = "U2FsdGVkX19EPt9QM+isptsgMQj+VOvzEw=="
-		var otherBuff = cipher.decrypt(buffer)
+		var key = "drumilt";
+		var buffer = "\xcc\xa1\xa9\xf7V\x98\x9fB\xb2m{-9\xddy\xa5\xbad\x15\xeb0" ;
+		var cipher = new ARC4(key);
+        var otherBuff = cipher.decrypt(buffer);
 		console.log("-- Decrypted --");
  		console.log(otherBuff);
  		console.log(otherBuff.toString());
-		document.getElementById('fil2').innerHTML = buffer;
+		document.getElementById('fil2').innerHTML = otherBuff;
 	</script>
 
 </body>
