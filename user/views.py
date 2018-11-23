@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 import threading
 import time
-
+import ast
 
 # Create your views here.
 @login_required(login_url="/accounts/login/")
@@ -26,7 +26,7 @@ def userhome(request, username):
 
 def dfs(node, tab):
     if node.dorf == 'f':
-        return " " * tab + "|\n" + " " * tab + "|___ " + node.name + "\n"
+        return " " * tab + "|\n" + " " * tab + "|___ " + node.name[:-6] + "\n"
     else:
         children = DirFile.objects.filter(owner__exact=node.owner).filter(parentId__exact=node.id)
         children = [c for c in children]
@@ -84,7 +84,12 @@ def dirview(request, pk, username):
             filename = curdir.name
             filename = filename[:-6]
             # look at this later
-            filedata = curdir.fileContent
+            #filedata = ast.literal_eval(curdir.fileContent) doesnt work
+            #filedata= filedata.decode() doesnt work
+            filedata= str(curdir.fileContent)
+            #print(type(filedata))
+            filedata = filedata[2:-1].replace('"', '\\"')
+            #filedata = filedata.encode('utf-8')
             print(filedata)
             # look at this later
             filetype = curdir.file_type

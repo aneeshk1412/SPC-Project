@@ -5,3 +5,5 @@ progressbar
 requests
 python-magic
 pycryptodome
+hashlib
+pycrypto

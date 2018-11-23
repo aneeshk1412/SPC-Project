@@ -1,0 +1,19 @@
+Instructions for setup:
+cd to the folder containing all setup files
+run 'bash install.sh'
+set url by doing 'spc server set-url <url>'
+to configure username, password, encryption-decryption type and password run 'spc config edit'
+observe a directory by giving it's absolute path to 'spc observe <abs_dir_path>'
+
+Instructions for changing encryption-decryption type:
+run 'spc en-de update' to give the details manually
+run 'spc en-de update <abs_file_path>' to give the details by entering absolute path (the file should contain first line as encryption-decryption type and second line encryption-decryption password)
+
+Instructions for syncing accross:
+run 'spc status' to check which files are replaced/deleted/added
+run 'spc sync' to update for each file replaced/deleted/added
+
+For other commands check 'man spc' or 'spc --help'
+
+
+
