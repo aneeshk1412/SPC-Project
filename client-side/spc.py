@@ -83,7 +83,7 @@ if login_cond:
     user=input('Username: ')
     pas=getpass.getpass(prompt='Password: ', stream=None)
     cpas=getpass.getpass(prompt='Confirm Password: ', stream=None)
-    enc_type=input('Encryption Type (des or aes or rsa): ')
+    enc_type=input('Encryption Type (blo or aes or rc4): ')
     enc_pas=getpass.getpass(prompt='Encryption Password: ', stream=None)
     if pas==cpas:
         if logintosite(user,pas):

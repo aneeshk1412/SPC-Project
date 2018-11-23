@@ -10,6 +10,7 @@ import progressbar
 import threading
 import subprocess
 import pythonencryptAES
+import compatible_Blowfish
 
 
 
@@ -63,8 +64,7 @@ def md5(fname):
 
 def encrypt(fname,enc_pas,enc_type):
     if enc_type=='blo':
-        subprocess.call("javac BlowEncDec.java")
-        subprocess.call("java BlowEncDec e"  + fname+ enc_pas)
+        compatible_Blowfish.BloEnc(fname,enc_pas)
     elif enc_type=='aes':
         pythonencryptAES.encrypt(fname,enc_pas)
 
@@ -72,8 +72,7 @@ def encrypt(fname,enc_pas,enc_type):
 
 def decrypt(fname,fcontent,enc_pas,enc_type):
     if enc_type=='blo':
-        subprocess.call("javac BlowEncDec.java")
-        subprocess.call("java BlowEncDec e"  + fname+fcontent+ enc_pas)
+        compatible_Blowfish.BloDec(fcontent,fname,enc_pas)
     elif enc_type=='aes':
         pythonencryptAES.decrypt(fname,fcontent,enc_pas)
 

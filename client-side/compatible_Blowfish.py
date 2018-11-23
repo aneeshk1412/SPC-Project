@@ -12,7 +12,7 @@ def BloEnc(file_name , KEY ):
         data = filed.read().encode()
         filed.close()
     except:
-        filed = open(file , "rb")
+        filed = open(file_name , "rb")
         data = filed.read()
         filed.close()
         pass
@@ -24,7 +24,8 @@ def BloEnc(file_name , KEY ):
     padding = pack('b'*plen, *padding)
     msg = IV + cipher.encrypt(data + padding)
     msg = base64.b64encode(msg)
-    return msg
+    with open(file_name + '.bloen', 'wb') as outfile:
+        outfile.write(msg)
 
 
 def BloDec(msg , out_file , key):
