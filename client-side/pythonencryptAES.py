@@ -40,9 +40,9 @@ def decrypt(filepath, encrypted, passphrase):
     aes = AES.new(passphrase, AES.MODE_CFB, IV, segment_size=128)
     decryptedfilecontents = aes.decrypt(encrypted[BLOCK_SIZE:])
     try:
-        print(decryptedfilecontents)
+        # print(decryptedfilecontents)
         decryptedfilecontents = unpad(decryptedfilecontents.decode())
-        print(decryptedfilecontents)
+        # print(decryptedfilecontents)
         decryptedfilecontents = decryptedfilecontents.encode()
     except:
         pass
