@@ -71,12 +71,13 @@ login_cond = len(sys.argv)==3 and sys.argv[1]=="config" and sys.argv[2]=="edit"
 observe_path_cond = len(sys.argv)==3 and sys.argv[1]=="observe"
 sync_dir_cond = len(sys.argv)==2 and sys.argv[1]=="sync"
 set_url_cond= len(sys.argv)==4 and sys.argv[1]=='server' and sys.argv[2]=='set-url'
-server_cond=len(sys.argv)==2 and sys.argv[1]=='server'
-version_cond=len(sys.argv)==2 and sys.argv[1]=='version'
+server_cond=len(sys.argv)==2 and sys.argv[1]=='--server'
+version_cond=len(sys.argv)==2 and sys.argv[1]=='--version'
 en_de_list_cond=len(sys.argv)==3 and sys.argv[1]=='en-de' and sys.argv[2]=='list'
-help_cond=len(sys.argv)==2 and sys.argv[1]=='help'
+help_cond=len(sys.argv)==2 and sys.argv[1]=='--help'
 status_cond=len(sys.argv)==2 and sys.argv[1]=='status'
 en_de_update_cond=len(sys.argv)==3 and sys.argv[1]=='en-de' and sys.argv[2]=='update'
+en_de_update_file_cond=len(sys.argv)==4 and sys.argv[1]=='en-de' and sys.argv[2]=='update'
 
 # Operations to perform for the conditions
 
@@ -181,7 +182,28 @@ elif en_de_list_cond:
     print('AES')
     print('ARC4')
 elif help_cond:
-    print('help')
+<<<<<<< HEAD
+    print('usage: spc [server set-url <url>] [config edit] [observe <abs-dir-path>] [status] [sync] [--server] [--version] [--help] [en-de list] [en-de update] [en-de update <abs_file_path>]')
+=======
+    print('usage: spc [server set-url <url>] [config edit] [observe <abs-dir-path>] [status] [sync] [server] [version] [help] [en-de list] [en-de update] [en-de update <abs_file_path>]')
+>>>>>>> refs/remotes/origin/master
+    print('For setting url: server set-url <url>')
+    print('For remembering username, password, encryption-scheme, encryption-password: config edit')
+    print('For observing directory given its absolute path: observe <abs-dir-path>')
+    print('For getting the status of changed/added/deleted files: status')
+    print('For syncing: sync')
+<<<<<<< HEAD
+    print('For getting server details: --server')
+    print('For getting version: --version')
+    print('For getting details of all commands: --help')
+=======
+    print('For getting server details: server')
+    print('For getting version: version')
+    print('For getting details of all commands: help')
+>>>>>>> refs/remotes/origin/master
+    print('For getting available Encryption-Decryption schemes: en-de list')
+    print('For updating Encryption-Decryption scheme by directly giving details: en-de update')
+    print('For updating Encryption-Decryption scheme by giving absolute file path having details: en-de update <abs-file-path>')
 elif status_cond:
     a = 0
     b = 0
@@ -251,6 +273,24 @@ elif en_de_update_cond:
     enc_typen = input('Encryption Type (blo or aes or arc): ')
     enc_pasn = getpass.getpass(prompt='Encryption Password: ', stream=None)
     if enc_type==enc_typen:
+        print('Error: Encryption types need to be different for updating')
+    else:
+        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+        g.write(enc_typen + '\n')
+        g.write(enc_pasn + '\n')
+        g.close()
+elif en_de_update_file_cond:
+    f = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")))
+    con = f.readlines()
+    enc_type = con[0].strip()
+    enc_pas = con[1].strip()
+    f.close()
+    h=open(sys.argv[3])
+    conn=h.readlines()
+    enc_typen = conn[0].strip()
+    enc_pasn = conn[1].strip()
+    h.close()
+    if enc_type == enc_typen:
         print('Error: Encryption types need to be different for updating')
     else:
         g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")

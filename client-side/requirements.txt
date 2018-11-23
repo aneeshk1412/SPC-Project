@@ -1,0 +1,9 @@
+django
+djangorestframework
+django-filter
+progressbar
+requests
+python-magic
+pycryptodome
+hashlib
+pycrypto

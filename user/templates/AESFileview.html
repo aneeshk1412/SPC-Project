@@ -3,11 +3,10 @@
 {% block content %}
 <h1>{{ file_name }}</h1>
 <div>
-    <div id="pass"></div>
     <div id="file"></div>
     <div id="img"></div>
     <div id="videofile"></div>
-    <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
+    <div id="music"></div>
 
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/aes.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/components/mode-cfb-min.js"></script>
@@ -39,14 +38,11 @@
         console.log(decrypted)
         if("{{ file_type }}" == "txt")
         {
-            console.log('here')
-            document.getElementById('file').innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
+            document.getElementById('file').innerHTML = '<embed width=50% src="data:text/html;base64,'+ btoa(decrypted.toString(CryptoJS.enc.Utf8)) + '"></embed>';
         }
         else if('{{ file_type }}' == 'jpg')
         {
-            console.log(btoa(decrypted))
-            document.getElementById('file').innerHTML = decrypted;
-            document.getElementById('img').innerHTML = "<img witdh=50pt src='data:image/jpg;base64,"+btoa(decrypted)+"'>"
+            document.getElementById('img').innerHTML = '<embed witdh=50% src="data:image/jpg;base64,'+btoa(decrypted)+'">'
         }
         else if('{{ file_type }}' == 'png')
         {
