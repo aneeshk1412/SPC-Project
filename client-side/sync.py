@@ -112,7 +112,7 @@ def status(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
             complete_path = os.path.join(rootDir, relFile)
             if (r2.ok):
                 dicti = r2.json()
-                if dicti['md5code'] != md5(encrypt(complete_path,enc_pas,enc_type)):
+                if dicti['md5code'] != md5(complete_path):
                     client_changed_files.append(str(dirname+'/'+relFile+'/'))
             else:
                 dirlist = os.path.normpath(dirname + '/' + relFile)
@@ -190,33 +190,39 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
             if relFile[0:2] == "./":
                 relFile = relFile[2:]
             file_dir_list.append(dirname + '/' + str(relFile) + '.' + enc_type + 'en' + '/')
+            # print(str(server_url + '/user/' + user + '/contents/' + dirname + '/' + relFile) + '.' + enc_type + 'en' + '/')
             r2 = s.get(str(server_url + '/user/' + user + '/contents/' + dirname + '/' + relFile) + '.' + enc_type + 'en' + '/',
                        data={'owner': int(userid)})
             complete_path = os.path.join(rootDir, relFile)
             if (r2.ok):
                 dicti = r2.json()
-                encrypt(complete_path, enc_pas, enc_type)
-                md=md5(complete_path + '.' + enc_type + 'en')
+
+                md=md5(complete_path)
                 if dicti['md5code'] != md:
                     if client_server == 's':
-
+                        encrypt(complete_path, enc_pas, enc_type)
                         with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
                             content = con.read()
                         if os.path.exists(complete_path + '.' + enc_type + 'en'):
                             os.remove(complete_path + '.' + enc_type + 'en')
+                        content=str(content)
+                        content=content[2:-1]
                         dicti['fileContent'] = content
                         dicti['md5code'] = md
                         dicti['username'] = user
                         dicti['encryption_scheme']=enc_type
                         del dicti['modifiedTime']
                         del dicti['pk']
+                        # print(dicti)
                         print('Replacing on server ' + dirname + '/' + relFile + '/')
                         dic = {'owner': int(userid), 'username': user, 'password': pas}
+                        # print(str(
+                        #     server_url + '/user/' + user + '/data/' + dirname +  '/' +'.' + enc_type + 'en' + relFile) + '/')
                         progress_bar(str(
-                            server_url + '/user/' + user + '/data/' + dirname + '.' + enc_type + 'en' + '/' + relFile) + '/',
+                            server_url + '/user/' + user + '/data/' + dirname + '/'  + relFile) + '.' + enc_type + 'en'+ '/',
                                      dicti, dic, 1, s)
                     else:
-                        r2 = s.get(str(server_url + '/user/' + user + '/data/' + dirname + '/' + relFile) + '/',
+                        r2 = s.get(str(server_url + '/user/' + user + '/data/' + dirname + '/' + relFile) + '.' + enc_type + 'en'+'/',
                                    data={'owner': int(userid), 'username': user, 'password': pas})
                         dat=r2.json()
                         content=dat['fileContent']
@@ -244,7 +250,7 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                 name = str(dirlist[i]) + '.' + enc_type + 'en'
                                 encrypt(complete_path, enc_pas, enc_type)
 
-                                md5code = md5(complete_path + '.' + enc_type + 'en')
+                                md5code = md5(complete_path)
                                 dorf = 'f'
                                 pathLineage = pat1
                                 with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
@@ -259,6 +265,7 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                          'dorf': dorf,
                                          'fileContent': fileContent, 'md5code': md5code, 'username': username,
                                          'encryption_scheme': enc_type, 'file_type': file_type }
+                                # print(dicti)
                                 dic = {}
                                 print('Adding to server ' + pathLineage)
                                 progress_bar(server_url + '/user/' + user + '/data/' + pathLineage,
@@ -314,7 +321,7 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                 l = len(fil)
                 if fil[l - 7:l - 1] == str('.' + enc_type + 'en'):
                     print('Deleting from server ' + fil[0:-7] + '/')
-                    progress_bar(server_url + '/user/' + user + '/data/' + fil[0:-7] + '/', dicti, dic, 2, s)
+                    progress_bar(server_url + '/user/' + user + '/data/' + fil , dicti, dic, 2, s)
                 else:
                     print('Deleting from server ' + fil)
                     progress_bar(server_url + '/user/' + user + '/data/' + fil, dicti, dic, 2, s)
