@@ -5,7 +5,7 @@
 <div>
     <div id="file"></div>
     <div id="img"></div>
-    <div id="videofile"></div>
+    <div id="videofile"><video id="player" controls></div>
     <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
 
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/aes.js"></script>
@@ -28,7 +28,12 @@
         }
         else if('{{ file_type }}' == 'mp4')
         {
+            var player = document.getElementById('player');
+            player.src = "data:video/webm;base64,"+ btoa(decrypted);
+            player.load();
+            player.play();
         }
+
     </script>
 
 </div>

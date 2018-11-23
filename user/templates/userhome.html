@@ -25,18 +25,20 @@
 </script>
 <script type="text/javascript">
 
-    if( localStorage['password'] )
-    {
-        document.getElementById("getpass").style.display = "none";
-    }
-    else
-    {
-
-    }
+    //if( localStorage['password'] )
+    //{
+      //  document.getElementById("getpass").style.display = "none";
+    //}
+    //else
+    //{
+        //document.getElementById("homeview").style.display = "none";
+    //}
     function myFunction() {
     document.getElementById("getpass").style.display = "none";
     localStorage['password'] = document.getElementById("pass").value;
+    document.getElementById("homeview").style.display = "initial";
     console.log(localStorage['password'])
 }
+
 </script>
 {% endblock %}

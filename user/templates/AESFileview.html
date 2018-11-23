@@ -13,8 +13,15 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/components/mode-cfb-min.js"></script>
     <script type="text/javascript" >
         var base64ciphertextFromPython = "{{ file_data }}" ;
-        var ciphertext = CryptoJS.enc.Base64.parse(base64ciphertextFromPython);
-
+        var ciphertext;
+        if("{{ file_type }}" == "txt")
+        {
+            ciphertext = CryptoJS.enc.Utf8.parse(base64ciphertextFromPython);
+        }
+        else
+        {
+            ciphertext = CryptoJS.enc.Base64.parse(base64ciphertextFromPython);
+        }
         // split iv and ciphertext
         var iv = ciphertext.clone();
         iv.sigBytes = 16;
@@ -26,12 +33,13 @@
 
         // decryption
         var decrypted = CryptoJS.AES.decrypt({ciphertext: ciphertext}, key, {
-          iv: iv,
-          mode: CryptoJS.mode.CFB
-        });
-
+      iv: iv,
+      mode: CryptoJS.mode.CFB
+    });
+        console.log(decrypted)
         if("{{ file_type }}" == "txt")
         {
+            console.log('here')
             document.getElementById('file').innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
         }
         else if('{{ file_type }}' == 'jpg')
@@ -48,6 +56,7 @@
         {
 
         }
+
     </script>
 
 </div>

@@ -75,12 +75,14 @@ def dirview(request, pk, username):
             filename = filename[:-6]
             # look at this later
             filedata = curdir.fileContent
-            # print(filedata)
+            print(filedata)
             # look at this later
             filetype = curdir.file_type
             context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
             return render(request, 'BLOFileview.html', context)
 
+
+curtime = time.time()
 
 @login_required(login_url="/accounts/login/")
 @api_view(['GET', 'POST', 'DELETE'])
@@ -96,9 +98,13 @@ def get_user_data(request, username):
             # if thread resets
             # return HttpResponse Busy
             # if thread ends
-            return Response(status=status.HTTP_423_LOCKED)
+            if time.time() - curtime > 120:
+                curtime = time.time()
+            else:
+                return Response(status=status.HTTP_423_LOCKED)
         else:
             userdata.profile.locked = True
+            curtime = time.time()
             # start the thread on server
             return Response(status=status.HTTP_200_OK)
 

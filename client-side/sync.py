@@ -233,8 +233,9 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                             content = str(dat['fileContent']).encode()
                         else:
                             content = dat['fileContent']
-                            print(content)
-                            print(type(content))
+                            content = content[2:-1]
+                            print(content.encode())
+                            content = content.encode()
 
                         print('Replacing on client ' + dirname + '/' + relFile + '/')
                         progress_bar(complete_path,enc_pas,enc_type,4,content)
@@ -345,8 +346,9 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                     content = str(dat5['fileContent']).encode()
                 else:
                     content = dat5['fileContent']
-                    print(content)
-                    print(type(content))
+                    content = content[2:-1]
+                    print(content.encode())
+                    content = content.encode()
                 dirlist = os.path.normpath(fil)
                 dirlist = dirlist.split(os.sep)
                 fil_pat=''
