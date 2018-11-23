@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e22e7df7-5cf7-4d53-a655-c5fce10c9da1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/AESFileview.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/AESFileview.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/userhome.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/userhome.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,7 +13,17 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/user/templates/userhome.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="64">
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -37,7 +46,6 @@
         <option value="$PROJECT_DIR$/user/templates/invalid.html" />
         <option value="$PROJECT_DIR$/user/admin.py" />
         <option value="$PROJECT_DIR$/todo.txt" />
-        <option value="$PROJECT_DIR$/user/templates/userhome.html" />
         <option value="$PROJECT_DIR$/user/templates/treeviewpage.html" />
         <option value="$PROJECT_DIR$/user/templates/directorypage.html" />
         <option value="$USER_HOME$/Downloads/sync.py" />
@@ -51,9 +59,10 @@
         <option value="$PROJECT_DIR$/client-side/AESencrypdecrypt.py" />
         <option value="$PROJECT_DIR$/spc/templates/basesite.html" />
         <option value="$PROJECT_DIR$/user/serializers.py" />
-        <option value="$PROJECT_DIR$/user/views.py" />
         <option value="$PROJECT_DIR$/user/models.py" />
         <option value="$PROJECT_DIR$/user/templates/AESFileview.html" />
+        <option value="$PROJECT_DIR$/user/views.py" />
+        <option value="$PROJECT_DIR$/user/templates/userhome.html" />
       </list>
     </option>
   </component>
@@ -80,18 +89,13 @@
             <path>
               <item name="SecurePersonalCloud" type="b2602c69:ProjectViewProjectNode" />
               <item name="SecurePersonalCloud" type="462c0819:PsiDirectoryNode" />
-              <item name="spc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SecurePersonalCloud" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SecurePersonalCloud" type="462c0819:PsiDirectoryNode" />
-              <item name="spc" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="user" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SecurePersonalCloud" type="b2602c69:ProjectViewProjectNode" />
               <item name="SecurePersonalCloud" type="462c0819:PsiDirectoryNode" />
               <item name="user" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -221,13 +225,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/manage.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/templates/userhome.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="14" column="74" selection-start-line="14" selection-start-column="74" selection-end-line="14" selection-end-column="74" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/templates/treeviewpage.html">
       <provider selected="true" editor-type-id="text-editor">
@@ -369,20 +366,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/user/templates/AESFileview.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="38" column="103" selection-start-line="38" selection-start-column="103" selection-end-line="38" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/user/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="69" column="35" lean-forward="true" selection-start-line="69" selection-start-column="35" selection-end-line="69" selection-end-column="35" />
+        <state relative-caret-position="88">
+          <caret line="62" column="45" selection-start-line="62" selection-start-column="45" selection-end-line="62" selection-end-column="45" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/templates/AESFileview.html">
+    <entry file="file://$PROJECT_DIR$/user/templates/userhome.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="38" column="103" selection-start-line="38" selection-start-column="103" selection-end-line="38" selection-end-column="103" />
+        <state relative-caret-position="64">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>

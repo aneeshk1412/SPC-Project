@@ -12,15 +12,24 @@ def pad(data):
     return data + chr(length)*length
 
 def unpad(data):
-    data = data.decode('utf-8')
     return data[:-ord(data[-1])]
 
 def encrypt(infilename, passphrase):
-    with open(infilename,'r') as infile:
-        message = infile.read()
+    try:
+        filed = open(infilename, 'r')
+        message = filed.read()
+        filed.close()
+        message += ' ' * (16 - len(message) % 16)
+        message = message.encode()
+    except:
+        filed = open(infilename, 'rb')
+        message = filed.read()
+        filed.close()
+        message += b' ' * (16 - len(message) % 16)
+        pass
     IV = Random.new().read(BLOCK_SIZE)
     aes = AES.new(passphrase, AES.MODE_CFB, IV, segment_size=128)
-    encryptedfilecontents = base64.b64encode(IV + aes.encrypt(pad(message)))
+    encryptedfilecontents = base64.b64encode(IV + aes.encrypt(message))
     with open(infilename+'.aesen', 'wb') as outfile:
         outfile.write(encryptedfilecontents)
 
@@ -28,7 +37,12 @@ def decrypt(filepath, encrypted, passphrase):
     encrypted = base64.b64decode(encrypted)
     IV = encrypted[:BLOCK_SIZE]
     aes = AES.new(passphrase, AES.MODE_CFB, IV, segment_size=128)
-    decryptedfilecontents = unpad(aes.decrypt(encrypted[BLOCK_SIZE:]))
+    decryptedfilecontents = aes.decrypt(encrypted[BLOCK_SIZE:])
+    try:
+    	decryptedfilecontents = unpad(decryptedfilecontents)
+    	decryptedfilecontents = decryptedfilecontents.encode()
+    except:
+    	pass
     with open(filepath, 'wb') as outfile:
         outfile.write(decryptedfilecontents)
 
@@ -46,3 +60,8 @@ def decrypt(filepath, encrypted, passphrase):
 # print(plain_text)
 # print(textToEncrypt)
 # print(encrypt(textToEncrypt,key))
+# if __name__ == '__main__':
+# 	encrypt('decryptAES.txt', key)
+# 	with open('decryptAES.txt.aesen','rb') as outfile:
+# 		a = outfile.read()
+# 	decrypt('res.txt', a, key)

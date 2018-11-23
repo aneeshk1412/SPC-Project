@@ -60,15 +60,16 @@ def dirview(request, pk, username):
         context = {'files': resdocs, 'dir': dirname}
         return render(request, 'directorypage.html', context)
     else:
-        filename = curdir.name
-        filename = filename[:-6]
-        # look at this later
-        filedata = curdir.fileContent
-        print(filedata)
-        # look at this later
-        filetype = curdir.file_type
-        context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
-        return render(request, 'AESFileview.html', context)
+        if curdir.encryption_scheme == 'aes':
+            filename = curdir.name
+            filename = filename[:-6]
+            # look at this later
+            filedata = curdir.fileContent
+            print(filedata)
+            # look at this later
+            filetype = curdir.file_type
+            context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
+            return render(request, 'AESFileview.html', context)
 
 
 @login_required(login_url="/accounts/login/")
