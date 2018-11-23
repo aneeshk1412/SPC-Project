@@ -47,11 +47,10 @@ def delete_post(ur, dat,dat1,b,s):
         decrypt(ur,s,dat,dat1)
     elif b==5:
         l = len(ur)
-        if ur[l - 7:l - 1] == str('.' + dat1 + 'en'):
-            decrypt(ur,s, dat, dat1)
-        else:
-            if not os.path.exists(ur):
-                os.makedirs(ur)
+        decrypt(ur,s, dat, dat1)
+        # else:
+        #     if not os.path.exists(ur):
+        #         os.makedirs(ur)
 
 
 def md5(fname):
@@ -205,8 +204,8 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                             content = con.read()
                         if os.path.exists(complete_path + '.' + enc_type + 'en'):
                             os.remove(complete_path + '.' + enc_type + 'en')
-                        content=str(content)
-                        content=content[2:-1]
+                        content=str(content.decode())
+                        #content=content[2:-1]
                         dicti['fileContent'] = content
                         dicti['md5code'] = md
                         dicti['username'] = user
@@ -225,7 +224,7 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                         r2 = s.get(str(server_url + '/user/' + user + '/data/' + dirname + '/' + relFile) + '.' + enc_type + 'en'+'/',
                                    data={'owner': int(userid), 'username': user, 'password': pas})
                         dat=r2.json()
-                        content=dat['fileContent']
+                        content=str(dat['fileContent']).encode()
                         print('Replacing on client ' + dirname + '/' + relFile + '/')
                         progress_bar(complete_path,enc_pas,enc_type,4,content)
             else:
@@ -257,9 +256,9 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                     content = con.read()
                                 if os.path.exists(complete_path + '.' + enc_type + 'en'):
                                     os.remove(complete_path + '.' + enc_type + 'en')
-                                fileContent = str(content)
-                                fileContent = fileContent[2:-1]
-
+                                fileContent = str(content.decode())
+                                #fileContent = fileContent[2:-1]
+                                print(fileContent)
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
                                          'pathLineage': pathLineage,
                                          'dorf': dorf,
@@ -326,10 +325,14 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                     print('Deleting from server ' + fil)
                     progress_bar(server_url + '/user/' + user + '/data/' + fil, dicti, dic, 2, s)
             else:
+                r5=s.get(server_url + '/user/' + user + '/data/' + fil,data={'owner': int(userid), 'username': user, 'password': pas})
+                dat5=r5.json()
+                content=str(dat5['fileContent']).encode()
                 dirlist = os.path.normpath(fil)
                 dirlist = dirlist.split(os.sep)
                 fil_pat=''
                 for i in range(len(dirlist)-1):
                     fil_pat=fil_pat+str(dirlist[i+1]) +'/'
-                print('Adding to client ' + fil)
-                progress_bar(os.path.join(rootDir, fil_pat),enc_pas,enc_type,5,content)
+                print('Adding to client ' + fil[:-7]+'/')
+                patn=os.path.join(rootDir, fil_pat)
+                progress_bar(patn[:-7],enc_pas,enc_type,5,content)
