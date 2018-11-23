@@ -12,26 +12,22 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/components/mode-cfb-min.js"></script>
     <script type="text/javascript" src="http://sladex.org/blowfish.js/ext/blowfish.js">	</script>
 	<script type="text/javascript">
-		var data = blowfish.decrypt({{ file_data }}, localStorage['password'], {cipherMode: 1, outputType: 0}),
+		var data = blowfish.decrypt('{{ file_data }}' , localStorage['password'], {cipherMode: 1, outputType: 0}),
 		decrypted = data.slice(8,);
-        \\check btoa
         if("{{ file_type }}" == "txt")
         {
             document.getElementById('file').innerHTML = decrypted;
         }
         else if('{{ file_type }}' == 'jpg')
         {
-            document.getElementById('img').innerHTML = '<embed src="data:image/jpg;base64,'+decrypted+'">'
+            document.getElementById('img').innerHTML = '<img width=50% src="data:image/jpg;base64,'+btoa(decrypted)+'">'
         }
         else if('{{ file_type }}' == 'png')
         {
-            document.getElementById('img').innerHTML = '<embed src="data:image/png;base64,'+decrypted+'">'
+            document.getElementById('img').innerHTML = '<embed src="data:image/png;base64,'+btoa(decrypted)+'">'
         }
         else if('{{ file_type }}' == 'mp4')
         {
-            document.getElementById('videofile').innerHTML = '<video class="video-js vjs-default-skin" data-setup='{"controls": true, "autoplay": false, "preload": "none", "poster": "https://www.cryaboutcrypt.ninja/static/crying.png", "width": 720, "height": 406}'>
-                    <source type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' src="data:video/mp4;base64,'+decrypted+'" />
-            </video>'
         }
     </script>
 

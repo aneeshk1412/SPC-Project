@@ -3,6 +3,7 @@
 {% block content %}
 <h1>{{ file_name }}</h1>
 <div>
+    <div id="pass"></div>
     <div id="file"></div>
     <div id="img"></div>
     <div id="videofile"></div>
@@ -11,7 +12,7 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/aes.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/components/mode-cfb-min.js"></script>
     <script type="text/javascript" >
-        var base64ciphertextFromPython = '{{ file_data }}';
+        var base64ciphertextFromPython = "{{ file_data }}" ;
         var ciphertext = CryptoJS.enc.Base64.parse(base64ciphertextFromPython);
 
         // split iv and ciphertext
@@ -35,7 +36,9 @@
         }
         else if('{{ file_type }}' == 'jpg')
         {
-            document.getElementById('img').innerHTML = '<embed src="data:image/jpg;base64,'+decrypted+'">'
+            console.log(btoa(decrypted))
+            document.getElementById('file').innerHTML = decrypted;
+            document.getElementById('img').innerHTML = "<img witdh=50pt src='data:image/jpg;base64,"+btoa(decrypted)+"'>"
         }
         else if('{{ file_type }}' == 'png')
         {
@@ -43,9 +46,7 @@
         }
         else if('{{ file_type }}' == 'mp4')
         {
-            document.getElementById('videofile').innerHTML = '<video class="video-js vjs-default-skin" data-setup='{"controls": true, "autoplay": false, "preload": "none", "poster": "https://www.cryaboutcrypt.ninja/static/crying.png", "width": 720, "height": 406}'>
-                    <source type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' src="data:video/mp4;base64,'+decrypted+'" />
-            </video>'
+
         }
     </script>
 
