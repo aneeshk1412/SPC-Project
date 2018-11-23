@@ -101,7 +101,7 @@ Array.prototype.isEqualTo = function(array){
  		//document.getElementById('fil2').innerHTML = otherBuff;
 		if("{{ file_type }}" == "txt")
         {
-            document.getElementById('file').innerHTML = '<embed src="data:text/html:base64,'+decrypted.toString(CryptoJS.enc.Utf8)+'"></embed>';
+            document.getElementById('file').innerHTML = '<embed src="data:text/txt:base64,'+decrypted.toString(CryptoJS.enc.Base64)+'"></embed>';
         }
         else if('{{ file_type }}' == 'jpg')
         {
@@ -121,7 +121,7 @@ Array.prototype.isEqualTo = function(array){
         }
         else if('{{ file_type }}' == 'mp3')
         {
-            document.getElementById('musicfile').innerHTML = '<embed src="data:" autostart="true" loop="false" width=50% ></embed>
+            document.getElementById('musicfile').innerHTML = '<embed src="data:" autostart="true" loop="false" width=50% ></embed>'
         }
 	</script>
 

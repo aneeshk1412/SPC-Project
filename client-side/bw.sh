@@ -1,5 +1,5 @@
 chmod +x spc.py
-python3 -m pip install -r "requirements.txt"
+# python3 -m pip install -r "requirements.txt"
 mkdir -p ~/bin
 cp spc.py ~/bin/spc
 cp sync.py ~/bin/sync.py
@@ -19,5 +19,6 @@ crontab crontab.cron
 
 export PATH=$PATH":$HOME/bin"
 
-# sudo cp my_print /usr/local/man/man1/spc.1
-# sudo gzip /usr/local/man/man1/spc.1
+c=$(sudo ls /usr/local/man | grep man)
+sudo cp my_spc /usr/local/man/$c/spc.1
+sudo gzip /usr/local/man/$c/spc.1

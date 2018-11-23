@@ -1,0 +1,34 @@
+.\" Manpage for spc
+.TH man 8 "06 May 2010" "1.0" "spc man page"
+.SH NAME
+spc \- secure personal cloud
+.SH SYNOPSIS
+spc [server set-url <url>] [config edit] [observe <abs-dir-path>] [status] [sync] [--server] [--version] [--help] [en-de list] [en-de update] [en-de update <abs_file_path>]
+.SH DESCRIPTION
+spc is a cloud based file system in which user has complete control over encryption schema of data that is uploaded to the servers
+.SH OPTIONS
+server set-url <url>: For setting url
+
+config edit: For remembering username, password, encryption-scheme, encryption-password
+
+observe <abs-dir-path>: For observing directory given its absolute path
+
+status: For getting the status of changed/added/deleted files
+
+sync: For syncing
+
+--server: For getting server details
+
+--version: For getting version
+
+--help: For getting details of all commands
+
+en-de list: For getting available Encryption-Decryption schemes
+
+en-de update: For updating Encryption-Decryption scheme by directly giving details
+
+en-de update <abs-file-path>: For updating Encryption-Decryption scheme by giving absolute file path having details
+
+    
+.SH AUTHOR
+importTeamName

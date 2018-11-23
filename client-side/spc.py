@@ -86,17 +86,25 @@ if login_cond:
     pas=getpass.getpass(prompt='Password: ', stream=None)
     cpas=getpass.getpass(prompt='Confirm Password: ', stream=None)
     enc_type=input('Encryption Type (blo or aes or arc): ')
-    enc_pas=getpass.getpass(prompt='Encryption Password: ', stream=None)
-    if pas==cpas:
-        if logintosite(user,pas):
-            print('Login as '+user+' was successful')
-            makeuser(user,pas,enc_type, enc_pas)
-        else:
-            print('Login was unsuccessful.. please check credentials or network again')
+    if enc_type!='blo' and 'aes' and 'arc':
+        print('Error: Incorrect Encryption-Decryption Scheme')
     else:
-        print('The passwords did not match, please try again')
+        enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
+        if pas == cpas:
+            if logintosite(user, pas):
+                print('Login as ' + user + ' was successful')
+                makeuser(user, pas, enc_type, enc_pas)
+            else:
+                print('Login was unsuccessful.. please check credentials or network again')
+        else:
+            print('The passwords did not match, please try again')
+
 elif observe_path_cond:
-    observer_dir(sys.argv[2])
+    if os.path.exists(sys.argv[2]):
+        observer_dir(sys.argv[2])
+    else:
+        print("Error: Directory doesn't exist")
+
 elif set_url_cond:
     set_url(sys.argv[3])
 elif sync_dir_cond:
@@ -144,8 +152,11 @@ elif sync_dir_cond:
         b=1
     else:
         enc_type = input('Encryption Type (blo or aes or arc): ')
-        enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
-        b=1
+        if enc_type != 'blo' and 'aes' and 'arc':
+            print('Error: Incorrect Encryption-Decryption Scheme')
+        else:
+            enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
+            b = 1
         
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")))
@@ -234,8 +245,11 @@ elif status_cond:
         b = 1
     else:
         enc_type = input('Encryption Type (blo or aes or arc): ')
-        enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
-        b = 1
+        if enc_type != 'blo' and enc_type!='aes' and enc_type!='arc':
+            print('Error: Incorrect Encryption-Decryption Scheme')
+        else:
+            enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
+            b = 1
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")))
         root_dir = f.readline()
@@ -261,14 +275,18 @@ elif en_de_update_cond:
     enc_pas = con[1].strip()
     f.close()
     enc_typen = input('Encryption Type (blo or aes or arc): ')
-    enc_pasn = getpass.getpass(prompt='Encryption Password: ', stream=None)
-    if enc_type==enc_typen:
-        print('Error: Encryption types need to be different for updating')
+    if enc_type != 'blo' and enc_type != 'aes' and enc_type != 'arc':
+        print('Error: Incorrect Encryption-Decryption Scheme')
     else:
-        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
-        g.write(enc_typen + '\n')
-        g.write(enc_pasn + '\n')
-        g.close()
+        enc_pasn = getpass.getpass(prompt='Encryption Password: ', stream=None)
+        if enc_type == enc_typen:
+            print('Error: Encryption types need to be different for updating')
+        else:
+            g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+            g.write(enc_typen + '\n')
+            g.write(enc_pasn + '\n')
+            g.close()
+
 elif en_de_update_file_cond:
     f = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")))
     con = f.readlines()
@@ -278,15 +296,19 @@ elif en_de_update_file_cond:
     h=open(sys.argv[3])
     conn=h.readlines()
     enc_typen = conn[0].strip()
-    enc_pasn = conn[1].strip()
-    h.close()
-    if enc_type == enc_typen:
-        print('Error: Encryption types need to be different for updating')
+    if enc_typen != 'blo' and enc_typen != 'aes' and enc_typen != 'arc':
+        print('Error: Incorrect Encryption-Decryption Scheme')
     else:
-        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
-        g.write(enc_typen + '\n')
-        g.write(enc_pasn + '\n')
-        g.close()
+        enc_pasn = conn[1].strip()
+        h.close()
+        if enc_type == enc_typen:
+            print('Error: Encryption types need to be different for updating')
+        else:
+            g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
+            g.write(enc_typen + '\n')
+            g.write(enc_pasn + '\n')
+            g.close()
+
 
 else:
     print("spc: invalid option -- ", end='')
