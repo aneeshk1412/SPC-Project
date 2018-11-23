@@ -54,7 +54,11 @@
         }
         else if('{{ file_type }}' == 'mp4')
         {
-
+            document.getElementById('videofile').innerHTML = '<video id="player" controls >'
+            var player = document.getElementById('player');
+            player.src = "data:video/webm;base64,"+ btoa(decrypted);
+            player.load();
+            player.play();
         }
 
     </script>

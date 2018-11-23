@@ -5,7 +5,7 @@
 <div>
     <div id="file"></div>
     <div id="img"></div>
-    <div id="videofile"><video id="player" controls></div>
+    <div id="videofile"></div>
     <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
 
     <script type="text/javascript">
@@ -109,6 +109,7 @@ Array.prototype.isEqualTo = function(array){
         }
         else if('{{ file_type }}' == 'mp4')
         {
+            document.getElementById('videofile').innerHTML = '<video id="player" controls >'
             var player = document.getElementById('player');
             player.src = "data:video/webm;base64,"+ btoa(decrypted);
             player.load();
