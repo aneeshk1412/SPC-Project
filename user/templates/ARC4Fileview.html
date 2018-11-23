@@ -1,0 +1,121 @@
+{% extends "basesite.html" %}
+
+{% block content %}
+<h1>{{ file_name }}</h1>
+<div>
+    <div id="file"></div>
+    <div id="img"></div>
+    <div id="videofile"><video id="player" controls></div>
+    <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
+
+    <script type="text/javascript">
+	var ARC4 = function(key){
+    var s = new Array(256);
+    var s2 = new Array(256);
+
+    for (var i = 0; i < 256; i++){
+        s[i] = i;
+        s2[i] = key.charCodeAt(i % key.length);
+    }
+
+    var j = 0;
+    for(var i = 0; i < 256; i++){
+        j = (j + s[i] + s2[i]) & 0xff;
+        var t = s[i];
+        s[i] = s[j];
+        s[j] = t;
+    }
+
+    this.s = s;
+}
+
+ARC4.prototype.encrypt = function(message){
+    var i = 0;
+    var j = 0;
+    var encrypted = [];
+    var temp = this.s.slice();
+
+    for(var k = 0; k < message.length; k++){
+        var charCode = 0;
+        i = (i + 1) & 0xff ;
+        j = (j + temp[i]) & 0xff;
+        var x = temp[i];
+        temp[i] = temp[j];
+        temp[j] = x;
+
+        if(message.constructor === Array){
+            charCode = message[k];
+        } else if (message.constructor === String){
+            charCode = message.charCodeAt(k);
+        }
+        encrypted[k] = (charCode ^ temp[(temp[i] + temp[j]) & 0xff]);
+    }
+    return encrypted;
+}
+
+ARC4.prototype.decrypt = function(message){
+    return this.encrypt(message);
+}
+
+String.prototype.toBuffer = function(string){
+    var buff = [];
+    for (var i=0; i < this.length; i++) {
+        buff[i] = this.charCodeAt(i);
+    }
+    return buff;
+}
+
+Array.prototype.toString = function(){
+    var string = '';
+    for (var i=0; i < this.length; i++) {
+        string += String.fromCharCode(this[i]);
+    }
+    return string;
+}
+
+Array.prototype.isEqualTo = function(array){
+    if(this.length !== array.length){
+        return false
+    }
+
+    for(var i = 0; i < this.length; i++){
+        if(this[i] !== array[i]){
+            return false;
+        }
+    }
+
+    return true;
+};
+</script>
+    	<script type="text/javascript">
+		var key = localStorage['password'];
+		var buffer = '{{ file_data }}' ;
+		var cipher = new ARC4(key);
+        var decrypted = cipher.decrypt(buffer);
+		console.log("-- Decrypted --");
+ 		console.log(decrypted);
+ 		//document.getElementById('fil2').innerHTML = otherBuff;
+		 if("{{ file_type }}" == "txt")
+        {
+            document.getElementById('file').innerHTML = decrypted;
+        }
+        else if('{{ file_type }}' == 'jpg')
+        {
+            document.getElementById('img').innerHTML = '<img width=50% src="data:image/jpg;base64,'+btoa(decrypted)+'">'
+        }
+        else if('{{ file_type }}' == 'png')
+        {
+            document.getElementById('img').innerHTML = '<embed src="data:image/png;base64,'+btoa(decrypted)+'">'
+        }
+        else if('{{ file_type }}' == 'mp4')
+        {
+            var player = document.getElementById('player');
+            player.src = "data:video/webm;base64,"+ btoa(decrypted);
+            player.load();
+            player.play();
+        }
+	</script>
+
+
+</div>
+{% endblock %}

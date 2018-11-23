@@ -80,6 +80,16 @@ def dirview(request, pk, username):
             filetype = curdir.file_type
             context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
             return render(request, 'BLOFileview.html', context)
+        elif curdir.encryption_scheme == 'arc':
+            filename = curdir.name
+            filename = filename[:-6]
+            # look at this later
+            filedata = curdir.fileContent
+            print(filedata)
+            # look at this later
+            filetype = curdir.file_type
+            context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
+            return render(request, 'ARC4Fileview.html', context)
 
 
 curtime = time.time()
