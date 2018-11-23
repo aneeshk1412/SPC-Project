@@ -11,7 +11,7 @@ import threading
 import subprocess
 import pythonencryptAES
 import compatible_Blowfish
-
+import compatible_ARC4
 
 
 def progress_bar(ur,dat,dat1,b,s):
@@ -63,10 +63,11 @@ def md5(fname):
 
 def encrypt(fname,enc_pas,enc_type):
     if enc_type=='blo':
-        compatible_Blowfish.BloEnc(fname,enc_pas)
+        compatible_Blowfish.BloEnc(fname, enc_pas)
     elif enc_type=='aes':
-        pythonencryptAES.encrypt(fname,enc_pas)
-
+        pythonencryptAES.encrypt(fname, enc_pas)
+    elif enc_type=='arc':
+        compatible_ARC4.ArcEnc(fname, enc_pas)
 
 
 def decrypt(fname,fcontent,enc_pas,enc_type):
@@ -74,6 +75,8 @@ def decrypt(fname,fcontent,enc_pas,enc_type):
         compatible_Blowfish.BloDec(fcontent,fname,enc_pas)
     elif enc_type=='aes':
         pythonencryptAES.decrypt(fname,fcontent,enc_pas)
+    elif enc_type=='arc':
+        compatible_ARC4.ArcDec(fcontent,fname,enc_pas)
 
 
 
@@ -202,9 +205,13 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                             content = con.read()
                         if os.path.exists(complete_path + '.' + enc_type + 'en'):
                             os.remove(complete_path + '.' + enc_type + 'en')
-                        content=str(content.decode())
+                        if not enc_type == 'arc':
+                            content = str(content.decode())
+                        else:
+                            content = str(content)
                         #content=content[2:-1]
                         dicti['fileContent'] = content
+
                         dicti['md5code'] = md
                         dicti['username'] = user
                         dicti['encryption_scheme']=enc_type
@@ -222,7 +229,13 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                         r2 = s.get(str(server_url + '/user/' + user + '/data/' + dirname + '/' + relFile) + '.' + enc_type + 'en'+'/',
                                    data={'owner': int(userid), 'username': user, 'password': pas})
                         dat=r2.json()
-                        content=str(dat['fileContent']).encode()
+                        if not enc_type =='arc':
+                            content = str(dat['fileContent']).encode()
+                        else:
+                            content = dat['fileContent']
+                            print(content)
+                            print(type(content))
+
                         print('Replacing on client ' + dirname + '/' + relFile + '/')
                         progress_bar(complete_path,enc_pas,enc_type,4,content)
             else:
@@ -254,7 +267,10 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                     content = con.read()
                                 if os.path.exists(complete_path + '.' + enc_type + 'en'):
                                     os.remove(complete_path + '.' + enc_type + 'en')
-                                fileContent = str(content.decode())
+                                if not enc_type =='arc':
+                                    fileContent = str(content.decode())
+                                else:
+                                    fileContent = str(content)
                                 #fileContent = fileContent[2:-1]
                                 print(fileContent)
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
@@ -325,7 +341,12 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
             else:
                 r5=s.get(server_url + '/user/' + user + '/data/' + fil,data={'owner': int(userid), 'username': user, 'password': pas})
                 dat5=r5.json()
-                content=str(dat5['fileContent']).encode()
+                if not enc_type == 'arc':
+                    content = str(dat5['fileContent']).encode()
+                else:
+                    content = dat5['fileContent']
+                    print(content)
+                    print(type(content))
                 dirlist = os.path.normpath(fil)
                 dirlist = dirlist.split(os.sep)
                 fil_pat=''

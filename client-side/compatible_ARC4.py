@@ -24,7 +24,7 @@ def ArcEnc(file_name , key ):
     #print(type(msg))
     with open(file_name + '.arcen', 'wb') as outfile:
         outfile.write(msg)
-    return msg
+    #return msg
 
 def ArcDec(msg , out_file , key):
     cipher = ARC4.new(key)
