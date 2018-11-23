@@ -19,7 +19,8 @@ def encrypt(infilename, passphrase):
         filed = open(infilename, 'r')
         message = filed.read()
         filed.close()
-        message += ' ' * (16 - len(message) % 16)
+        if (len(message)%16 != 0 ):
+            message +=  chr(16 - len(message) % 16)*(16 - len(message) % 16)
         message = message.encode()
     except:
         filed = open(infilename, 'rb')
@@ -39,10 +40,12 @@ def decrypt(filepath, encrypted, passphrase):
     aes = AES.new(passphrase, AES.MODE_CFB, IV, segment_size=128)
     decryptedfilecontents = aes.decrypt(encrypted[BLOCK_SIZE:])
     try:
-    	decryptedfilecontents = unpad(decryptedfilecontents)
-    	decryptedfilecontents = decryptedfilecontents.encode()
+        print(decryptedfilecontents)
+        decryptedfilecontents = unpad(decryptedfilecontents.decode())
+        print(decryptedfilecontents)
+        decryptedfilecontents = decryptedfilecontents.encode()
     except:
-    	pass
+        pass
     with open(filepath, 'wb') as outfile:
         outfile.write(decryptedfilecontents)
 
