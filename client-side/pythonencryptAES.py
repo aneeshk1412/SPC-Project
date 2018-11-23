@@ -46,4 +46,3 @@ def decrypt(filepath, encrypted, passphrase):
 # print(plain_text)
 # print(textToEncrypt)
 # print(encrypt(textToEncrypt,key))
-encrypt()

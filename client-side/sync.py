@@ -72,10 +72,10 @@ def encrypt(fname,enc_pas,enc_type):
 
 
 def decrypt(fname,fcontent,enc_pas,enc_type):
-    if enc_type='blo':
+    if enc_type=='blo':
         subprocess.call("javac BlowEncDec.java")
         subprocess.call("java BlowEncDec e"  + fname+fcontent+ enc_pas)
-    elif enc_type='aes':
+    elif enc_type=='aes':
         pythonencryptAES.decrypt(fname,fcontent,enc_pas)
 
 
@@ -240,18 +240,25 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                 parentid = data2['pk']
                                 owner = int(userid)
                                 username = user
-                                file_type=str(dirlist[i])[-3:0]
+                                file_type =str(dirlist[i])[-3:]
                                 name = str(dirlist[i]) + '.' + enc_type + 'en'
-                                md5code = md5(encrypt(complete_path, enc_pas,enc_type))
+                                encrypt(complete_path, enc_pas, enc_type)
+
+                                md5code = md5(complete_path + '.' + enc_type + 'en')
                                 dorf = 'f'
                                 pathLineage = pat1
-                                fileContent = encrypt(complete_path, enc_pas,enc_type)
+                                with open(complete_path + '.' + enc_type + 'en', 'rb') as con:
+                                    content = con.read()
+                                if os.path.exists(complete_path + '.' + enc_type + 'en'):
+                                    os.remove(complete_path + '.' + enc_type + 'en')
+                                fileContent = str(content)
+                                fileContent = fileContent[2:-1]
 
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
                                          'pathLineage': pathLineage,
                                          'dorf': dorf,
                                          'fileContent': fileContent, 'md5code': md5code, 'username': username,
-                                         'encryption_scheme'= enc_type, 'file_type'= file_type }
+                                         'encryption_scheme': enc_type, 'file_type': file_type }
                                 dic = {}
                                 print('Adding to server ' + pathLineage)
                                 progress_bar(server_url + '/user/' + user + '/data/' + pathLineage,
@@ -285,7 +292,7 @@ def sync(user, pas, userid, rootDir, enc_type, enc_pas, server_url):
                                 fileContent = '-'
                                 dicti = {'owner': owner, 'parentId': int(parentid), 'name': name,
                                          'pathLineage': pathLineage,
-                                         'dorf': dorf, 'encryption_scheme':enc_type,'file_type':'-'
+                                         'dorf': dorf, 'encryption_scheme':enc_type,'file_type':'-',
                                          'fileContent': fileContent, 'md5code': md5code, 'username': username}
                                 dic = {}
                                 print('Adding to server ' + pathLineage)
