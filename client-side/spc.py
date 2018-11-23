@@ -32,7 +32,7 @@ def logintosite(user, pas):
     else:
         print('Error: spc server set-url <url> command needs to be run before login')
 
-def makeuser(user, pas, enc_type):
+def makeuser(user, pas, enc_type,enc_pas):
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/ur.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/ur.txt")))
         server_url = f.readline()
@@ -46,7 +46,8 @@ def makeuser(user, pas, enc_type):
         f.write(str(user_id) + '\n')
         f.close()
         g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
-        g.write(enc_type)
+        g.write(enc_type+'\n')
+        g.write(enc_pas+'\n')
         g.close()
     else:
         print('Error: spc server set-url <url> command needs to be run before login')
@@ -83,10 +84,11 @@ if login_cond:
     pas=getpass.getpass(prompt='Password: ', stream=None)
     cpas=getpass.getpass(prompt='Confirm Password: ', stream=None)
     enc_type=input('Encryption Type (des or aes or rsa): ')
+    enc_pas=getpass.getpass(prompt='Encryption Password: ', stream=None)
     if pas==cpas:
         if logintosite(user,pas):
             print('Login as '+user+' was successful')
-            makeuser(user,pas,enc_type)
+            makeuser(user,pas,enc_type, enc_pas)
         else:
             print('Login was unsuccessful.. please check credentials or network again')
     else:
@@ -105,6 +107,7 @@ elif sync_dir_cond:
     root_dir=''
     server_url=''
     user_id=0
+    enc_pas=''
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/auth.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/auth.txt")))
         con = f.readlines()
@@ -132,14 +135,14 @@ elif sync_dir_cond:
             print('The passwords did not match, please try again')
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/enc.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")))
-        enc_type = f.readline()
+        con=f.readlines()
+        enc_type = con[0].strip()
+        enc_pas=con[1].strip()
         f.close()
         b=1
     else:
         enc_type = input('Encryption Type (DES or AES or RSA): ')
-        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
-        g.write(enc_type)
-        g.close()
+        enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
         b=1
         
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
@@ -158,7 +161,7 @@ elif sync_dir_cond:
     else:
         print('Error: spc server set-url <url> command needs to be run before running sync')
     if a==1 and b==1 and c==1 and d==1:
-        sync.sync(usr, pa, user_id, root_dir, enc_type, server_url)
+        sync.sync(usr, pa, user_id, root_dir, enc_type, enc_pas, server_url)
 elif server_cond:
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/ur.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/ur.txt")))
@@ -187,6 +190,7 @@ elif status_cond:
     pa = ''
     root_dir = ''
     server_url = ''
+    enc_pas=''
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/auth.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/auth.txt")))
         con = f.readlines()
@@ -210,14 +214,14 @@ elif status_cond:
             print('The passwords did not match, please try again')
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/enc.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")))
-        enc_type = f.readline()
+        con = f.readlines()
+        enc_type = con[0].strip()
+        enc_pas = con[1].strip()
         f.close()
         b = 1
     else:
         enc_type = input('Encryption Type (des or aes or rsa): ')
-        g = open(os.path.expanduser(os.path.join("~", "spc_details/enc.txt")), "w+")
-        g.write(enc_type)
-        g.close()
+        enc_pas = getpass.getpass(prompt='Encryption Password: ', stream=None)
         b = 1
     if os.path.exists(os.path.expanduser(os.path.join("~", "spc_details/dir.txt"))):
         f = open(os.path.expanduser(os.path.join("~", "spc_details/dir.txt")))
@@ -236,7 +240,7 @@ elif status_cond:
         print('Error: spc server set-url <url> command needs to be run before running status')
     user_id = 1
     if a == 1 and b == 1 and c == 1 and d == 1:
-        sync.status(usr, pa, user_id, root_dir, enc_type, server_url)
+        sync.status(usr, pa, user_id, root_dir, enc_type, enc_pas, server_url)
 else:
     print("spc: invalid option -- ", end='')
     for i in range(len(sys.argv)-2):

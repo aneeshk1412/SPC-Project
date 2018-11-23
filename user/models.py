@@ -19,8 +19,10 @@ class DirFile(models.Model):
         default='f',
         help_text='File or Directory',
     )
-    fileContent = models.BinaryField(max_length=10000000, editable=True)
+    fileContent = models.TextField()
     modifiedTime = models.DateTimeField(auto_now=True)
+    encryption_scheme = models.CharField(max_length=100)
+    file_type = models.CharField(max_length=20)
 
     def __str__(self):
         uname = str(self.owner)
