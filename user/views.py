@@ -65,11 +65,21 @@ def dirview(request, pk, username):
             filename = filename[:-6]
             # look at this later
             filedata = curdir.fileContent
-            print(filedata)
+            # print(filedata)
             # look at this later
             filetype = curdir.file_type
             context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
             return render(request, 'AESFileview.html', context)
+        elif curdir.encryption_scheme == 'blo':
+            filename = curdir.name
+            filename = filename[:-6]
+            # look at this later
+            filedata = curdir.fileContent
+            # print(filedata)
+            # look at this later
+            filetype = curdir.file_type
+            context = {'file_name': filename, 'file_data': filedata, 'file_type': filetype}
+            return render(request, 'BLOFileview.html', context)
 
 
 @login_required(login_url="/accounts/login/")

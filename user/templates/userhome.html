@@ -2,8 +2,12 @@
 
 {% block content %}
 <h1>Hello {{ user }}</h1>
-
-<div>
+<div id="getpass">
+    Please Enter Your Encryption Scheme Password:
+    <input type="text" name="passw" id="pass">
+    <button type="button" onclick="myFunction()">Submit</button>
+</div>
+<div id="homeview">
 {% if files %}
     <ul>
       {% for f in files %}
@@ -16,4 +20,22 @@
     <a href="/user/{{ user }}/tree/" class="button" align="left">Tree View</a>
   {% endif %}
 </div>
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript">
+
+    if( localStorage['password'] )
+    {
+        document.getElementById("getpass").style.display = "none";
+    }
+    else
+    {
+
+    }
+    function myFunction() {
+    document.getElementById("getpass").style.display = "none";
+    localStorage['password'] = document.getElementById("pass").value;
+}
+</script>
 {% endblock %}
