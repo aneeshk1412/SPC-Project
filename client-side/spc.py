@@ -182,25 +182,15 @@ elif en_de_list_cond:
     print('AES')
     print('ARC4')
 elif help_cond:
-<<<<<<< HEAD
     print('usage: spc [server set-url <url>] [config edit] [observe <abs-dir-path>] [status] [sync] [--server] [--version] [--help] [en-de list] [en-de update] [en-de update <abs_file_path>]')
-=======
-    print('usage: spc [server set-url <url>] [config edit] [observe <abs-dir-path>] [status] [sync] [server] [version] [help] [en-de list] [en-de update] [en-de update <abs_file_path>]')
->>>>>>> refs/remotes/origin/master
     print('For setting url: server set-url <url>')
     print('For remembering username, password, encryption-scheme, encryption-password: config edit')
     print('For observing directory given its absolute path: observe <abs-dir-path>')
     print('For getting the status of changed/added/deleted files: status')
     print('For syncing: sync')
-<<<<<<< HEAD
     print('For getting server details: --server')
     print('For getting version: --version')
     print('For getting details of all commands: --help')
-=======
-    print('For getting server details: server')
-    print('For getting version: version')
-    print('For getting details of all commands: help')
->>>>>>> refs/remotes/origin/master
     print('For getting available Encryption-Decryption schemes: en-de list')
     print('For updating Encryption-Decryption scheme by directly giving details: en-de update')
     print('For updating Encryption-Decryption scheme by giving absolute file path having details: en-de update <abs-file-path>')
